@@ -32,10 +32,21 @@ class Settings:
     imap_password: str | None = None
     imap_mailbox: str = "INBOX"
     imap_sender_filter: str | None = None  # e.g. your placement cell's address
+    # Read-only Microsoft 365 / Outlook via Microsoft Graph (IMAP passwords don't work there).
+    # The client ID comes from an app registration; see README "Outlook / Microsoft 365".
+    ms_client_id: str | None = None
+    ms_tenant: str = "organizations"
 
     @property
     def imap_configured(self) -> bool:
         return bool(self.imap_host and self.imap_user and self.imap_password)
+
+    @property
+    def mail_source(self) -> str | None:
+        """Which inbox sync is set up: "graph" (Outlook), "imap", or None."""
+        if self.ms_client_id:
+            return "graph"
+        return "imap" if self.imap_configured else None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -54,4 +65,6 @@ class Settings:
             imap_password=env("IMAP_PASSWORD") or None,
             imap_mailbox=env("IMAP_MAILBOX") or cls.imap_mailbox,
             imap_sender_filter=env("IMAP_SENDER_FILTER") or None,
+            ms_client_id=env("MS_CLIENT_ID") or None,
+            ms_tenant=env("MS_TENANT") or cls.ms_tenant,
         )

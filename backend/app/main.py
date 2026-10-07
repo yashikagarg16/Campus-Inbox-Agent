@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from . import service
 from .config import Settings
 from .extractor import ExtractionFailed, GeminiClient, LLMClient
+from .graph_mail import GraphAuthRequired, GraphMail, get_token
 from .models import AuditEvent, DraftRow, EmailRow, OpportunityRow, make_sessionmaker
 from .parsing import parse_eml
 from .schemas import Decision, DraftStatus, FieldIssue, Profile, local_now, to_local_naive
@@ -115,7 +116,8 @@ class SyncOut(BaseModel):
 
 class ConfigOut(BaseModel):
     llm_configured: bool
-    imap_configured: bool
+    imap_configured: bool  # any inbox sync (IMAP or Outlook) is set up
+    mail_source: str | None = None  # "graph" | "imap" | None
     auth_required: bool
 
 
@@ -147,7 +149,7 @@ def _detail(opp: OpportunityRow) -> OpportunityDetail:
 # --- app ---------------------------------------------------------------------------------------
 
 def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMClient] | None = None,
-               imap_fetch: Callable | None = None) -> FastAPI:
+               imap_fetch: Callable | None = None, graph_fetch: Callable | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(title="Campus Inbox Agent", version="0.2.0")
     app.state.sessionmaker = make_sessionmaker(settings.database_url, migrate=settings.migrate_on_startup)
@@ -209,7 +211,8 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
     @api.get("/config", response_model=ConfigOut)
     def read_config() -> ConfigOut:
         return ConfigOut(llm_configured=bool(settings.gemini_api_key) or llm_factory is not None,
-                         imap_configured=settings.imap_configured, auth_required=settings.app_token is not None)
+                         imap_configured=settings.mail_source is not None, mail_source=settings.mail_source,
+                         auth_required=settings.app_token is not None)
 
     @api.get("/profile", response_model=Profile)
     def read_profile(session: Session = Depends(get_session)) -> Profile:
@@ -253,20 +256,34 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
         service.audit(session, "email_deleted", deleted_email_id=email_id)
         session.commit()
 
-    @api.post("/sync/imap", response_model=SyncOut)
-    def sync_imap(body: SyncRequest, session: Session = Depends(get_session),
-                  llm: LLMClient = Depends(get_llm)) -> SyncOut:
-        if not settings.imap_configured:
-            raise HTTPException(503, "IMAP is not configured on the server (IMAP_HOST, IMAP_USER, IMAP_PASSWORD).")
+    @api.post("/sync/inbox", response_model=SyncOut)
+    @api.post("/sync/imap", response_model=SyncOut, include_in_schema=False)  # older name
+    def sync_inbox(body: SyncRequest, session: Session = Depends(get_session),
+                   llm: LLMClient = Depends(get_llm)) -> SyncOut:
         since = (local_now() - timedelta(days=body.since_days)).date()
-        kwargs = {"fetch": imap_fetch} if imap_fetch else {}
+        source = settings.mail_source
+        if source is None:
+            raise HTTPException(503, "No inbox sync is configured on the server (MS_CLIENT_ID for Outlook, "
+                                     "or IMAP_HOST/IMAP_USER/IMAP_PASSWORD).")
         try:
-            result = service.sync_imap(session, llm, settings, since, limit=body.limit, **kwargs)
+            if source == "graph":
+                fetch = graph_fetch or _graph_fetch
+                messages = fetch(since, sender=settings.imap_sender_filter, limit=body.limit)
+                result = service.sync_messages(session, llm, messages, since, "outlook")
+            else:
+                kwargs = {"fetch": imap_fetch} if imap_fetch else {}
+                result = service.sync_imap(session, llm, settings, since, limit=body.limit, **kwargs)
+        except GraphAuthRequired as e:
+            raise HTTPException(503, str(e)) from e
         except imaplib.IMAP4.error as e:  # e.g. wrong app password
             raise HTTPException(502, f"Mail server refused the request: {e}") from e
-        except OSError as e:
+        except OSError as e:  # includes requests' connection errors
             raise HTTPException(502, f"Couldn't reach the mail server: {type(e).__name__}") from e
         return SyncOut(**result.__dict__)
+
+    def _graph_fetch(since, sender, limit):
+        token = get_token(settings.ms_client_id, settings.ms_tenant, interactive=False)
+        return GraphMail(token).raw_messages(since, sender=sender, limit=limit)
 
     @api.get("/opportunities", response_model=list[OpportunitySummary])
     def list_opportunities(session: Session = Depends(get_session)) -> list[OpportunitySummary]:

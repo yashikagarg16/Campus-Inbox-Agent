@@ -37,7 +37,10 @@ export function SettingsPage() {
           <h2 className="mb-2 font-semibold">Server</h2>
           <ul className="space-y-1 text-sm">
             <li>LLM (Gemini): {config.llm_configured ? "configured" : "not configured: set GEMINI_API_KEY"}</li>
-            <li>Inbox sync (IMAP, read-only): {config.imap_configured ? "configured" : "not configured"}</li>
+            <li>
+              Inbox sync (read-only):{" "}
+              {config.mail_source === "graph" ? "Outlook / Microsoft 365" : config.imap_configured ? "IMAP" : "not configured"}
+            </li>
             <li>Access token required: {config.auth_required ? "yes" : "no"}</li>
           </ul>
         </Card>

@@ -1,4 +1,4 @@
-"""Collect real placement emails over read-only IMAP for the labeled eval set.
+"""Collect real placement emails, read-only, for the labeled eval set.
 
 Step 1, look before reading anything (headers only: sender, subject, date):
     python -m tools.collect_eval_emails senders --since 2025-07-01
@@ -6,9 +6,12 @@ Step 1, look before reading anything (headers only: sender, subject, date):
 Step 2, download only the senders you confirmed, redacted, into the gitignored private folder:
     python -m tools.collect_eval_emails download --from placement@college.edu --since 2025-07-01
 
-Writes eval/data/private/candidates.jsonl (one email per line, unlabeled). Re-running appends
-only emails that aren't already there. Uses IMAP_HOST / IMAP_USER / IMAP_PASSWORD from .env.
-Nothing is sent anywhere else, and no LLM is called.
+Or, with no mailbox access, import .eml files you downloaded yourself:
+    python -m tools.collect_eval_emails import-files --dir path/to/emls
+
+The mailbox is Outlook / Microsoft 365 via Graph if MS_CLIENT_ID is set, otherwise IMAP
+(IMAP_HOST / IMAP_USER / IMAP_PASSWORD). Writes eval/data/private/candidates.jsonl (one email
+per line, unlabeled); re-running appends only new emails. No LLM is called.
 """
 
 from __future__ import annotations
@@ -23,6 +26,7 @@ from email.utils import parseaddr
 from pathlib import Path
 
 from app.config import Settings
+from app.graph_mail import GraphMail, get_token
 from app.imap_sync import fetch_headers, fetch_raw_messages
 from app.parsing import parse_eml
 
@@ -78,6 +82,9 @@ def collect(raw_messages, names: list[str], existing: list[dict]) -> list[dict]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
+    files = sub.add_parser("import-files")
+    files.add_argument("--dir", type=Path, required=True)
+    files.add_argument("--names", nargs="*", default=[], help="names to redact, e.g. your own")
     for name in ("senders", "download"):
         p = sub.add_parser(name)
         p.add_argument("--since", type=date.fromisoformat, default=date(date.today().year - 1, 7, 1))
@@ -91,14 +98,40 @@ def main() -> None:
     args = ap.parse_args()
 
     s = Settings.from_env()
-    if not s.imap_configured:
-        sys.exit("Set IMAP_HOST, IMAP_USER and IMAP_PASSWORD in backend/.env first.")
+    if args.cmd == "import-files":
+        raws = [p.read_bytes() for p in sorted(args.dir.glob("*.eml"))]
+        if not raws:
+            sys.exit(f"No .eml files in {args.dir}")
+        _save(lambda existing: collect(raws, args.names, existing))
+        return
+
     keywords = args.keyword or DEFAULT_KEYWORDS
+    if s.ms_client_id:
+        mail = GraphMail(get_token(s.ms_client_id, s.ms_tenant, show=lambda m: print(m, flush=True)))
+
+        def fetch_hdrs(since, limit):
+            return mail.headers(since, keywords=keywords, limit=limit)
+
+        def fetch_raw(since, sender, limit, kw):
+            return mail.raw_messages(since, sender=sender, keywords=kw, limit=limit)
+
+        own_names = mail.identity()
+    elif s.imap_configured:
+        def fetch_hdrs(since, limit):
+            return fetch_headers(s.imap_host, s.imap_user, s.imap_password, since, mailbox=s.imap_mailbox,
+                                 keywords=keywords, limit=limit)
+
+        def fetch_raw(since, sender, limit, kw):
+            return fetch_raw_messages(s.imap_host, s.imap_user, s.imap_password, since, mailbox=s.imap_mailbox,
+                                      sender=sender, limit=limit, keywords=kw)
+
+        own_names = [s.imap_user.split("@")[0]]
+    else:
+        sys.exit("Set MS_CLIENT_ID (Outlook) or IMAP_HOST/IMAP_USER/IMAP_PASSWORD in backend/.env first, "
+                 "or use import-files.")
 
     if args.cmd == "senders":
-        headers = fetch_headers(s.imap_host, s.imap_user, s.imap_password, args.since, mailbox=s.imap_mailbox,
-                                keywords=keywords, limit=args.limit)
-        rows = list_senders(headers)
+        rows = list_senders(fetch_hdrs(args.since, args.limit))
         print(f"{sum(n for _, n, _ in rows)} matching emails since {args.since}, by sender:\n")
         for addr, n, subjects in rows:
             print(f"{n:4d}  {addr}")
@@ -106,15 +139,23 @@ def main() -> None:
                 print(f"        - {subj[:90]}")
         return
 
+    names = [*args.names, *own_names]
+
+    def gather(existing: list[dict]) -> list[dict]:
+        added: list[dict] = []
+        for sender in args.senders:
+            raws = fetch_raw(args.since, sender, args.limit, None if args.all_mail else keywords)
+            added += collect(raws, names, existing + added)
+        return added
+
+    _save(gather)
+
+
+def _save(gather) -> None:
     PRIVATE_DIR.mkdir(parents=True, exist_ok=True)
     out = PRIVATE_DIR / "candidates.jsonl"
     existing = [json.loads(l) for l in out.read_text(encoding="utf-8").splitlines() if l.strip()] if out.exists() else []
-    names = [*args.names, s.imap_user.split("@")[0]]
-    added = []
-    for sender in args.senders:
-        raws = fetch_raw_messages(s.imap_host, s.imap_user, s.imap_password, args.since, mailbox=s.imap_mailbox,
-                                  sender=sender, limit=args.limit, keywords=None if args.all_mail else keywords)
-        added += collect(raws, names, existing + added)
+    added = gather(existing)
     with out.open("a", encoding="utf-8") as f:
         for rec in added:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")

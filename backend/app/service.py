@@ -6,6 +6,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from typing import Iterable
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -162,11 +163,10 @@ class SyncResult:
     email_ids: list[int] = field(default_factory=list)
 
 
-def sync_imap(session: Session, client: LLMClient, settings, since: date, limit: int = 25,
-              fetch=fetch_raw_messages) -> SyncResult:
+def sync_messages(session: Session, client: LLMClient, messages: Iterable[bytes], since: date,
+                  source: str) -> SyncResult:
+    """Run raw RFC 822 messages (from IMAP or Outlook) through the pipeline, skipping duplicates."""
     result = SyncResult()
-    messages = fetch(settings.imap_host, settings.imap_user, settings.imap_password, since,
-                     mailbox=settings.imap_mailbox, sender=settings.imap_sender_filter, limit=limit)
     for raw in messages:
         result.fetched += 1
         parsed = parse_eml(raw)
@@ -174,7 +174,7 @@ def sync_imap(session: Session, client: LLMClient, settings, since: date, limit:
             continue
         try:
             outcome = ingest_email(session, client, parsed.body, subject=parsed.subject, sender=parsed.sender,
-                                   received_at=parsed.received_at, message_id=parsed.message_id, source="imap")
+                                   received_at=parsed.received_at, message_id=parsed.message_id, source=source)
         except ExtractionFailed:
             result.failed += 1
             continue
@@ -183,10 +183,17 @@ def sync_imap(session: Session, client: LLMClient, settings, since: date, limit:
         else:
             result.new += 1
             result.email_ids.append(outcome.email.id)
-    audit(session, "imap_sync", fetched=result.fetched, new=result.new, duplicates=result.duplicates,
-          failed=result.failed, since=since.isoformat())
+    audit(session, "inbox_sync", source=source, fetched=result.fetched, new=result.new,
+          duplicates=result.duplicates, failed=result.failed, since=since.isoformat())
     session.commit()
     return result
+
+
+def sync_imap(session: Session, client: LLMClient, settings, since: date, limit: int = 25,
+              fetch=fetch_raw_messages) -> SyncResult:
+    messages = fetch(settings.imap_host, settings.imap_user, settings.imap_password, since,
+                     mailbox=settings.imap_mailbox, sender=settings.imap_sender_filter, limit=limit)
+    return sync_messages(session, client, messages, since, "imap")
 
 
 # --- drafts ------------------------------------------------------------------------------------

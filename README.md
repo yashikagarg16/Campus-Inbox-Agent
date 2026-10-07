@@ -94,10 +94,27 @@ Then fill in your profile and paste an email.
 
 ### Inbox sync (optional)
 
-Set `IMAP_HOST`, `IMAP_USER`, `IMAP_PASSWORD` (and ideally `IMAP_SENDER_FILTER` = your placement
-cell's address) in `backend/.env`. For Gmail use `imap.gmail.com` and an
-[app password](https://myaccount.google.com/apppasswords). A "Check inbox" button then appears on the
-dashboard, or run `python -m tools.fetch_imap --days 7`.
+**Outlook / Microsoft 365 (most college accounts).** Microsoft 365 doesn't accept passwords over
+IMAP, so the app reads mail through Microsoft Graph with read-only permissions (`Mail.Read`, plus
+`User.Read` to know your own name for redaction). One-time setup:
+
+1. Sign in to https://portal.azure.com with your college account › **Microsoft Entra ID** ›
+   **App registrations** › **New registration**. Name it "Campus Inbox Agent", choose
+   "Accounts in this organizational directory only", leave the redirect URI empty, and register.
+2. In the new app: **Authentication** › **Allow public client flows** › **Yes** › Save.
+3. **API permissions** should list Microsoft Graph `User.Read`; add **Delegated** `Mail.Read`.
+4. From **Overview**, copy the *Application (client) ID* into `MS_CLIENT_ID` and the
+   *Directory (tenant) ID* into `MS_TENANT` in `backend/.env`.
+5. Run `python -m tools.fetch_outlook --sign-in`, open the link it prints, and enter the code.
+
+After that, `python -m tools.fetch_outlook --days 7` and the dashboard's "Check inbox" button work.
+If your college blocks app registration or shows "Need admin approval", use the `.eml` route below.
+
+**Gmail or other IMAP accounts.** Set `IMAP_HOST`, `IMAP_USER` and `IMAP_PASSWORD` (for Gmail:
+`imap.gmail.com` and an [app password](https://myaccount.google.com/apppasswords)), then use the
+"Check inbox" button or `python -m tools.fetch_imap --days 7`.
+
+`IMAP_SENDER_FILTER` (your placement cell's address) limits either source to that sender.
 
 ## API
 
@@ -109,7 +126,7 @@ dashboard, or run `python -m tools.fetch_imap --days 7`.
 | POST | `/emails` | Pasted text: `{"text", "subject?", "received_at?"}`; 201 new, 200 duplicate |
 | POST | `/emails/eml` | Upload a `.eml` file |
 | DELETE | `/emails/{id}` | Remove an email and everything derived from it |
-| POST | `/sync/imap` | `{"since_days": 7, "limit": 25}` |
+| POST | `/sync/inbox` | `{"since_days": 7, "limit": 25}`; Outlook or IMAP, whichever is configured |
 | GET | `/opportunities` | Sorted by deadline |
 | GET | `/opportunities/{id}` | Email text, extraction, per-rule results with evidence spans, drafts |
 | GET | `/opportunities/{id}/audit` | Every step, timestamped, including raw LLM output |
@@ -136,11 +153,19 @@ schema of that database). CI runs it against a Postgres container on every push.
 `backend/eval/data/synthetic.jsonl` has 8 **made-up** emails (including a digest email and a
 "closes tomorrow" deadline) to exercise the harness. They are not a benchmark. For real numbers:
 
-1. Collect 60–100 real emails. Run `python -m tools.redact mail.txt --names "..."` and read the
-   output yourself.
-2. Label each one in the same JSONL format: true deadline, batches, CGPA, link, expected verdict
-   for the profile in `eval/data/eval_profile.json`. Keep real emails in `eval/data/private/`
-   (gitignored) unless they are fully redacted.
+1. Collect 60–100 real emails into `eval/data/private/candidates.jsonl` (gitignored). With Outlook or
+   IMAP set up:
+   ```bash
+   cd backend
+   python -m tools.collect_eval_emails senders --since 2025-07-01        # headers only
+   python -m tools.collect_eval_emails download --from <placement-cell-address> --since 2025-07-01
+   ```
+   Without mailbox access, download the emails as `.eml` (Outlook on the web: open the email ›
+   ⋯ › Download) into one folder and run
+   `python -m tools.collect_eval_emails import-files --dir <folder>`.
+   Both redact email addresses, phone numbers and your own name; read the output anyway.
+2. Label each one: true deadline, batches, CGPA, link, and the expected verdict for your profile
+   (`expected_opportunities`, same format as `eval/data/synthetic.jsonl`).
 3. Split the set: tune the prompt on one part and report numbers only from the part you never
    looked at.
 

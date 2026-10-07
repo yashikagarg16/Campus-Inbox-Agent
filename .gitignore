@@ -13,3 +13,4 @@ frontend/.env.local
 backend/ci_check.db
 *.tsbuildinfo
 demo/out/
+backend/.graph_token_cache.json

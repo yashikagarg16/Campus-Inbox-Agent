@@ -95,7 +95,8 @@ export interface AuditEvent {
 
 export interface ServerConfig {
   llm_configured: boolean;
-  imap_configured: boolean;
+  imap_configured: boolean; // any inbox sync is set up
+  mail_source?: "graph" | "imap" | null;
   auth_required: boolean;
 }
 
@@ -193,7 +194,7 @@ export const api = {
   },
   deleteEmail: (id: number) => request<void>(`/emails/${id}`, { method: "DELETE" }),
   syncImap: (sinceDays: number) =>
-    request<SyncResult>("/sync/imap", { method: "POST", body: json({ since_days: sinceDays }) }),
+    request<SyncResult>("/sync/inbox", { method: "POST", body: json({ since_days: sinceDays }) }),
   listOpportunities: () => request<OpportunitySummary[]>("/opportunities"),
   getOpportunity: (id: number) => request<OpportunityDetail>(`/opportunities/${id}`),
   getAudit: (id: number) => request<AuditEvent[]>(`/opportunities/${id}/audit`),
