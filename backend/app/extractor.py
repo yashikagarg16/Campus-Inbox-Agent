@@ -6,7 +6,9 @@ The LLM only reads and writes. It never decides eligibility.
 from __future__ import annotations
 
 import json
+import random
 import re
+import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol
@@ -233,20 +235,49 @@ def draft_answers(client: LLMClient, profile_json: str, opportunity_json: str, q
     raise ExtractionFailed(f"Couldn't draft answers: {last_error}", raws)
 
 
+RETRYABLE_STATUS = {429, 500, 502, 503, 504}
+
+
 class GeminiClient:
-    def __init__(self, api_key: str, model: str, thinking_level: str | None = None):
+    """Gemini with retries: overload (503) and rate-limit (429) errors are usually brief.
+
+    After `retries` back-off retries on the main model, the optional `fallback_model` gets the
+    same treatment. Other errors (bad key, invalid request) are raised immediately.
+    """
+
+    def __init__(self, api_key: str, model: str, thinking_level: str | None = None,
+                 fallback_model: str | None = None, retries: int = 3, backoff_seconds: float = 2.0,
+                 sleep=time.sleep):
         from google import genai
 
         self._client = genai.Client(api_key=api_key)
-        self._model = model
+        self._models = [model] + ([fallback_model] if fallback_model and fallback_model != model else [])
         self._thinking_level = thinking_level
+        self._retries = retries
+        self._backoff = backoff_seconds
+        self._sleep = sleep
 
     def generate(self, prompt: str) -> str:
-        from google.genai import types
+        from google.genai import errors, types
 
         # Gemini 3+ rejects sampling parameters such as temperature; leave them unset.
-        config = types.GenerateContentConfig(response_mime_type="application/json")
+        config = types.GenerateContentConfig(
+            response_mime_type="application/json",
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+        )
         if self._thinking_level:
             config.thinking_config = types.ThinkingConfig(thinking_level=self._thinking_level)
-        response = self._client.models.generate_content(model=self._model, contents=prompt, config=config)
-        return response.text or ""
+
+        last_error: Exception | None = None
+        for model in self._models:
+            for attempt in range(self._retries + 1):
+                try:
+                    response = self._client.models.generate_content(model=model, contents=prompt, config=config)
+                    return response.text or ""
+                except errors.APIError as e:
+                    if e.code not in RETRYABLE_STATUS:
+                        raise
+                    last_error = e
+                    if attempt < self._retries:
+                        self._sleep(self._backoff * 2 ** attempt + random.uniform(0, 1))
+        raise last_error  # type: ignore[misc]

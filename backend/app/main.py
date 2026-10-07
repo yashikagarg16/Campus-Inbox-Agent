@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from . import service
 from .config import Settings
-from .extractor import ExtractionFailed, GeminiClient, LLMClient
+from .extractor import ExtractionFailed, LLMClient
 from .graph_mail import GraphAuthRequired, GraphMail, get_token
 from .models import AuditEvent, DraftRow, EmailRow, OpportunityRow, make_sessionmaker
 from .parsing import parse_eml
@@ -157,7 +157,7 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
     def default_llm() -> LLMClient:
         if not settings.gemini_api_key:
             raise HTTPException(503, "GEMINI_API_KEY is not set on the server.")
-        return GeminiClient(settings.gemini_api_key, settings.gemini_model, settings.gemini_thinking_level)
+        return settings.gemini_client()
 
     app.state.llm_factory = llm_factory or default_llm
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"],

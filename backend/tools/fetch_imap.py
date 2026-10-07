@@ -14,7 +14,6 @@ import sys
 from datetime import timedelta
 
 from app.config import Settings
-from app.extractor import GeminiClient
 from app.models import make_sessionmaker
 from app.schemas import local_now
 from app.service import sync_imap
@@ -35,7 +34,7 @@ def main() -> None:
     Session = make_sessionmaker(settings.database_url, migrate=settings.migrate_on_startup)
     since = (local_now() - timedelta(days=args.days)).date()
     with Session() as session:
-        result = sync_imap(session, GeminiClient(settings.gemini_api_key, settings.gemini_model, settings.gemini_thinking_level),
+        result = sync_imap(session, settings.gemini_client(),
                            settings, since, limit=args.limit)
     print(f"fetched {result.fetched}, new {result.new}, duplicates {result.duplicates}, failed {result.failed}")
 

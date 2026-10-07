@@ -21,6 +21,8 @@ class Settings:
     gemini_model: str = "gemini-3.8-flash"
     # "low" | "medium" | "high"; unset uses the model's default (medium).
     gemini_thinking_level: str | None = None
+    # Used when the main model stays overloaded after retries, e.g. gemini-3.5-flash-lite.
+    gemini_fallback_model: str | None = None
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173"])
     # If set, every endpoint except /health requires "Authorization: Bearer <app_token>".
     app_token: str | None = None
@@ -36,6 +38,12 @@ class Settings:
     # The client ID comes from an app registration; see README "Outlook / Microsoft 365".
     ms_client_id: str | None = None
     ms_tenant: str = "organizations"
+
+    def gemini_client(self):
+        from .extractor import GeminiClient
+
+        return GeminiClient(self.gemini_api_key, self.gemini_model, self.gemini_thinking_level,
+                            fallback_model=self.gemini_fallback_model)
 
     @property
     def imap_configured(self) -> bool:
@@ -57,6 +65,7 @@ class Settings:
             gemini_api_key=env("GEMINI_API_KEY") or None,
             gemini_model=env("GEMINI_MODEL") or cls.gemini_model,
             gemini_thinking_level=env("GEMINI_THINKING_LEVEL") or None,
+            gemini_fallback_model=env("GEMINI_FALLBACK_MODEL") or None,
             cors_origins=[o.strip() for o in env("CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()],
             app_token=env("APP_TOKEN") or None,
             migrate_on_startup=env("MIGRATE_ON_STARTUP", "true").lower() != "false",

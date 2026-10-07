@@ -14,7 +14,6 @@ import sys
 from datetime import timedelta
 
 from app.config import Settings
-from app.extractor import GeminiClient
 from app.graph_mail import GraphMail, get_token
 from app.models import make_sessionmaker
 from app.schemas import local_now
@@ -43,7 +42,7 @@ def main() -> None:
     Session = make_sessionmaker(settings.database_url, migrate=settings.migrate_on_startup)
     since = (local_now() - timedelta(days=args.days)).date()
     messages = GraphMail(token).raw_messages(since, sender=settings.imap_sender_filter, limit=args.limit)
-    llm = GeminiClient(settings.gemini_api_key, settings.gemini_model, settings.gemini_thinking_level)
+    llm = settings.gemini_client()
     with Session() as session:
         r = sync_messages(session, llm, messages, since, "outlook")
     print(f"fetched {r.fetched}, new {r.new}, duplicates {r.duplicates}, failed {r.failed}")

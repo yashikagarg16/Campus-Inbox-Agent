@@ -177,3 +177,54 @@ def test_gemini_client_sends_no_sampling_params(monkeypatch):
     assert seen["config"].temperature is None
     assert seen["config"].response_mime_type == "application/json"
     assert seen["config"].thinking_config.thinking_level.lower() == "low"
+
+
+def _client_with_responses(monkeypatch, outcomes, **kw):
+    """GeminiClient whose generate_content returns/raises `outcomes` in order."""
+    from app.extractor import GeminiClient
+
+    sleeps = []
+    client = GeminiClient("fake-key", "main-model", sleep=sleeps.append, **kw)
+    calls = []
+
+    class FakeModels:
+        def generate_content(self, model, contents, config):
+            calls.append(model)
+            outcome = outcomes.pop(0)
+            if isinstance(outcome, Exception):
+                raise outcome
+            return type("R", (), {"text": outcome})()
+
+    monkeypatch.setattr(client._client, "_models", FakeModels(), raising=False)
+    monkeypatch.setattr(type(client._client), "models", property(lambda self: self._models))
+    return client, calls, sleeps
+
+
+def _api_error(code):
+    from google.genai import errors
+
+    return errors.ServerError(code, {"error": {"code": code, "message": "busy", "status": "UNAVAILABLE"}}) \
+        if code >= 500 else errors.ClientError(code, {"error": {"code": code, "message": "x", "status": "X"}})
+
+
+def test_gemini_retries_overload_then_succeeds(monkeypatch):
+    client, calls, sleeps = _client_with_responses(monkeypatch, [_api_error(503), _api_error(429), "{}"])
+    assert client.generate("hi") == "{}"
+    assert calls == ["main-model"] * 3
+    assert len(sleeps) == 2 and sleeps[1] > sleeps[0] - 1  # exponential back-off
+
+
+def test_gemini_falls_back_to_second_model(monkeypatch):
+    client, calls, _ = _client_with_responses(
+        monkeypatch, [_api_error(503)] * 4 + ["{}"], fallback_model="lite-model")
+    assert client.generate("hi") == "{}"
+    assert calls == ["main-model"] * 4 + ["lite-model"]
+
+
+def test_gemini_does_not_retry_bad_requests(monkeypatch):
+    from google.genai import errors
+
+    client, calls, _ = _client_with_responses(monkeypatch, [_api_error(400)])
+    with pytest.raises(errors.ClientError):
+        client.generate("hi")
+    assert calls == ["main-model"]
