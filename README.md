@@ -1,0 +1,187 @@
+# Campus Inbox Agent
+
+Reads placement and internship emails, extracts the key facts (company, role, deadline,
+eligibility, form link), checks eligibility against your profile **in plain code**, and shows the
+exact sentence from the email behind every decision. When it can't be sure, it says
+**needs review** instead of guessing. It never submits anything for you.
+
+## How it works
+
+```
+email (paste / .eml / read-only IMAP)
+  -> [1] parse & clean, de-duplicate             app/parsing.py, app/service.py
+  -> [2] LLM extracts fields + quotes            app/extractor.py
+  -> [3] Pydantic validation, retry              app/schemas.py
+  -> [4] evidence guard                          app/evidence.py
+  -> [5] rule engine (no LLM)                    app/rules.py
+  -> [6] eligible / not eligible / needs review
+  -> [7] dashboard, evidence viewer, drafted answers you approve      frontend/
+         every step stored in an audit log        app/models.py
+```
+
+**The LLM reads and writes; code decides.** "Is 8.4 ≥ 8.5?" is an `if` statement, not a prompt.
+
+### Evidence guard
+
+Every extracted value must come with a quote from the email. A field is rejected if:
+
+- the quote isn't in the email (whitespace, case, smart quotes and dashes are normalised), or
+- the value isn't in its own quote: a CGPA of 8.5 needs "8.5" in the quote, batch 2026 needs 2026
+  or a range like 2026-2028, a form link must appear in the email, and a deadline's day must be in
+  its quote (or the quote says "today"/"tomorrow" and the date matches the received date), or
+- the deadline is before the date the email arrived.
+
+The LLM gets another try with the rejection reasons. If a field still fails, it is blanked, and
+if it was an eligibility field, the verdict becomes **needs review**.
+
+### Verdict rules
+
+| Situation | Result |
+|---|---|
+| Any verified requirement you don't meet | **Not eligible** |
+| …but the email hedges ("or equivalent", "may be relaxed", "preferred") | **Needs review** |
+| Unrecognised branch names, CGPA scale mismatch, missing profile value | **Needs review** |
+| Your branch is a specialisation of a listed one (CSE (AI&ML) vs CSE) | **Needs review**, until you add an alias |
+| Conditions code can't check ("strong academic record") | **Needs review** |
+| Missing skills (wording varies, often optional) | **Needs review**, never a fail |
+| No eligibility criteria found, or the email isn't an opportunity | **Needs review** |
+| Every rule passes | **Eligible** |
+
+Changing your profile re-runs the rules on every stored email without calling the LLM.
+
+### Other features
+
+- **Digest emails**: one email listing several companies becomes several opportunities, each with its
+  own criteria and verdict.
+- **Duplicates**: the same email pasted twice (or the same Message-ID) isn't processed or billed again.
+- **Drafted answers**: paste a form's questions; the LLM drafts answers from your profile only. Missing
+  facts become `[NEEDS INPUT: …]`, numbers that aren't in your profile or the email are flagged, and
+  you can't approve a draft until the placeholders are filled. You copy approved answers into the form
+  yourself.
+- **Read-only inbox sync**: IMAP with `readonly=True` and `BODY.PEEK`, so mail is never changed or even
+  marked as read.
+- **Delete**: deleting an email removes its opportunities, drafts and audit events.
+
+## Run it locally
+
+Backend (Python 3.11+):
+
+```bash
+cd backend
+python -m venv .venv
+.venv/Scripts/activate          # Windows; use `source .venv/bin/activate` on macOS/Linux
+pip install -r requirements-dev.txt
+cp .env.example .env            # then set GEMINI_API_KEY
+uvicorn app.main:create_app --factory --reload
+```
+
+Migrations run automatically on startup. API docs: http://localhost:8000/docs
+
+Frontend (Node 20+):
+
+```bash
+cd frontend
+npm install
+npm run dev                     # http://localhost:5173
+```
+
+Then fill in your profile and paste an email.
+
+### Inbox sync (optional)
+
+Set `IMAP_HOST`, `IMAP_USER`, `IMAP_PASSWORD` (and ideally `IMAP_SENDER_FILTER` = your placement
+cell's address) in `backend/.env`. For Gmail use `imap.gmail.com` and an
+[app password](https://myaccount.google.com/apppasswords). A "Check inbox" button then appears on the
+dashboard, or run `python -m tools.fetch_imap --days 7`.
+
+## API
+
+| Method | Path | |
+|---|---|---|
+| GET | `/health` | No auth |
+| GET | `/config` | What the server has configured |
+| GET / PUT | `/profile` | Batch, CGPA, branch (+aliases), 10th/12th %, backlogs, skills, about-you text |
+| POST | `/emails` | Pasted text: `{"text", "subject?", "received_at?"}`; 201 new, 200 duplicate |
+| POST | `/emails/eml` | Upload a `.eml` file |
+| DELETE | `/emails/{id}` | Remove an email and everything derived from it |
+| POST | `/sync/imap` | `{"since_days": 7, "limit": 25}` |
+| GET | `/opportunities` | Sorted by deadline |
+| GET | `/opportunities/{id}` | Email text, extraction, per-rule results with evidence spans, drafts |
+| GET | `/opportunities/{id}/audit` | Every step, timestamped, including raw LLM output |
+| POST | `/opportunities/{id}/drafts` | `{"questions": [...]}` |
+| PUT / DELETE | `/drafts/{id}` | Edit (`answer`) or approve (`status: "approved"`) |
+
+If `APP_TOKEN` is set, every endpoint except `/health` needs `Authorization: Bearer <APP_TOKEN>`.
+Enter the token on the frontend's Settings page. **Set it on any deployed server**: the database
+holds your profile and emails.
+
+## Tests
+
+```bash
+cd backend && pytest -q          # 114 tests; uses a fake LLM, no API key needed
+cd frontend && npm test          # 15 tests
+```
+
+To also run the PostgreSQL integration test locally, set
+`TEST_POSTGRES_URL=postgresql://user:pass@localhost:5432/some_empty_db` (it resets the `public`
+schema of that database). CI runs it against a Postgres container on every push.
+
+## Eval
+
+`backend/eval/data/synthetic.jsonl` has 8 **made-up** emails (including a digest email and a
+"closes tomorrow" deadline) to exercise the harness. They are not a benchmark. For real numbers:
+
+1. Collect 60–100 real emails. Run `python -m tools.redact mail.txt --names "..."` and read the
+   output yourself.
+2. Label each one in the same JSONL format: true deadline, batches, CGPA, link, expected verdict
+   for the profile in `eval/data/eval_profile.json`. Keep real emails in `eval/data/private/`
+   (gitignored) unless they are fully redacted.
+3. Split the set: tune the prompt on one part and report numbers only from the part you never
+   looked at.
+
+```bash
+cd backend
+python -m eval.run_eval --data eval/data/private/test.jsonl              # calls Gemini
+python -m eval.run_eval --data ... --replay eval/out/predictions.jsonl  # re-score for free
+```
+
+The report separates **missed** fields (safe: they show up as needs review) from **wrong** and
+**spurious** ones (dangerous), confident wrong verdicts from abstentions, and missed or invented
+opportunities in digest emails. CI runs the eval when a `GEMINI_API_KEY` repository secret exists.
+
+## Deploy
+
+**Backend + database on Render**: New › Blueprint › this repo. `render.yaml` creates the API and a
+PostgreSQL database and generates `APP_TOKEN` (copy it from the Render dashboard). Set
+`GEMINI_API_KEY` and `CORS_ORIGINS` (your Vercel URL).
+
+**Frontend on Vercel**: import the repo, set the root directory to `frontend` and
+`VITE_API_URL` to the Render URL. `vercel.json` handles client-side routes.
+
+For a public demo, use a demo profile and redacted or synthetic emails, not your real ones.
+
+## Schema changes
+
+Edit `backend/app/models.py`, then:
+
+```bash
+cd backend && alembic revision --autogenerate -m "describe the change"
+```
+
+Review the generated file in `migrations/versions/`. CI fails if models and migrations drift apart.
+
+## Known limitations
+
+- Branch aliases cover common Indian B.Tech names. Anything else becomes needs review until you add
+  your own aliases on the profile page.
+- Deadlines without a time default to 23:59 IST. Relative dates beyond "today"/"tomorrow" ("by
+  Friday") are rejected and shown as unclear.
+- The form itself is never fetched, so drafting needs you to paste the questions.
+- The eval numbers depend entirely on your labeled set; one college's email style won't generalise.
+
+## Principles
+
+- Read-only access. No auto-submission, ever.
+- Redact personal data in demos and test files.
+- Report only measured results, with the dataset size and its limits.
+- Anything uncertain is marked **needs review**.

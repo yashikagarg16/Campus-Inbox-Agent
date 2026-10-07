@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.db
+.pytest_cache/
+node_modules/
+dist/
+backend/eval/data/private/
+backend/eval/out/
+frontend/.env
+frontend/.env.local
+backend/ci_check.db
+*.tsbuildinfo

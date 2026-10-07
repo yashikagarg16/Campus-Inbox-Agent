@@ -1,0 +1,10 @@
+{
+  "batch": 2027,
+  "cgpa": 8.4,
+  "cgpa_scale": 10,
+  "branch": "CSE",
+  "tenth_percent": 92,
+  "twelfth_percent": 88,
+  "active_backlogs": 0,
+  "skills": ["Python", "SQL"]
+}
