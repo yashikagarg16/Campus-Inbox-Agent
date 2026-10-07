@@ -143,10 +143,11 @@ export function DashboardPage() {
                       {o.company ?? "Unknown company"}
                       {o.role && <span className="font-normal text-slate-500"> · {o.role}</span>}
                     </p>
-                    <p className="truncate text-xs text-slate-500">
-                      {!o.is_opportunity && "Notice, not an application · "}
-                      {o.subject ?? "No subject"}
-                    </p>
+                    {(o.subject || !o.is_opportunity) && (
+                      <p className="truncate text-xs text-slate-500">
+                        {[!o.is_opportunity && "Notice, not an application", o.subject].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
                   </div>
                   <div className={`text-right text-sm ${URGENCY_CLASS[urgency]}`}>
                     <div>{formatDeadline(o.deadline)}</div>

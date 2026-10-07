@@ -157,3 +157,23 @@ def test_draft_wrong_count_is_retried():
     llm = FakeLLM({"answers": []}, {"answers": [{"question": "q", "answer": "a"}]})
     assert draft_answers(llm, "{}", "{}", ["q"]) == ["a"]
     assert len(llm.prompts) == 2
+
+
+def test_gemini_client_sends_no_sampling_params(monkeypatch):
+    from app.extractor import GeminiClient
+
+    client = GeminiClient("fake-key", "gemini-3.8-flash", thinking_level="low")
+    seen = {}
+
+    class FakeModels:
+        def generate_content(self, model, contents, config):
+            seen.update(model=model, config=config)
+            return type("R", (), {"text": "{}"})()
+
+    monkeypatch.setattr(client._client, "_models", FakeModels(), raising=False)
+    monkeypatch.setattr(type(client._client), "models", property(lambda self: self._models))
+    assert client.generate("hi") == "{}"
+    assert seen["model"] == "gemini-3.8-flash"
+    assert seen["config"].temperature is None
+    assert seen["config"].response_mime_type == "application/json"
+    assert seen["config"].thinking_config.thinking_level.lower() == "low"

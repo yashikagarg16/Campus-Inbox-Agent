@@ -12,3 +12,4 @@ frontend/.env
 frontend/.env.local
 backend/ci_check.db
 *.tsbuildinfo
+demo/out/

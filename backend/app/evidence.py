@@ -102,17 +102,32 @@ def _has_number(value: float, evidence: str) -> bool:
 
 
 _RELATIVE_DAYS = (("day after tomorrow", 2), ("tomorrow", 1), ("today", 0), ("tonight", 0), ("eod", 0))
+_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+_WEEKDAY_RE = re.compile(r"\b(?:(next|coming|this)\s+)?(mon|tues?|wed(?:nes)?|thu(?:rs?)?|fri|sat(?:ur)?|sun)(?:day)?\b")
 
 
-def _relative_day(evidence: str) -> int | None:
-    """Days after the received date that a relative deadline quote means, if it is one."""
+def _relative_day(evidence: str, received_at: datetime | None) -> tuple[bool, int | None, str | None]:
+    """Interpret a relative deadline quote ("tomorrow", "by Friday").
+
+    Returns (is_relative, days after the received date, problem). Only unambiguous
+    phrases resolve: "next Friday", or "Friday" in an email sent on a Friday, could
+    mean two different dates, so they are reported as a problem instead of guessed.
+    """
     text = normalize(evidence)
     if _NUMBER_RE.search(re.sub(r"\d{1,2}(:\d{2})?\s*(am|pm)|\d{1,2}:\d{2}", "", text)):
-        return None  # an explicit date is present; check that instead
-    for phrase, days in _RELATIVE_DAYS:
-        if re.search(rf"\b{phrase}\b", text):
-            return days
-    return None
+        return False, None, None  # an explicit date is present; check that instead
+    days = next((d for phrase, d in _RELATIVE_DAYS if re.search(rf"\b{phrase}\b", text)), None)
+    weekday = _WEEKDAY_RE.search(text) if days is None else None
+    if days is None and weekday is None:
+        return False, None, None
+    if received_at is None:
+        return True, None, "deadline is relative but the received date is unknown"
+    if weekday is not None:
+        target = next(i for i, name in enumerate(_WEEKDAYS) if name.startswith(weekday.group(2)[:3]))
+        days = (target - received_at.weekday()) % 7
+        if weekday.group(1) in ("next", "coming") or days == 0:
+            return True, None, f"'{weekday.group(0).strip()}' could mean two different dates"
+    return True, days, None
 
 
 def _clean_url(url: str) -> str:
@@ -134,11 +149,11 @@ def _grounding_problem(name: str, value, evidence: str, text: str, received_at: 
         if _clean_url(value) not in text:
             return "link does not appear in the email"
     elif name == "deadline":
-        relative = _relative_day(evidence)
-        if relative is not None:
-            if received_at is None:
-                return "deadline is relative (today/tomorrow) but the received date is unknown"
-            if (value.date() - received_at.date()).days != relative:
+        is_relative, days, problem = _relative_day(evidence, received_at)
+        if problem:
+            return problem
+        if is_relative:
+            if (value.date() - received_at.date()).days != days:
                 return "deadline doesn't match the relative date in the quote"
         elif not _has_number(value.day, evidence):
             return f"deadline day ({value.day}) is not stated in the evidence quote"

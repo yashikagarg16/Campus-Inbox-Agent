@@ -155,7 +155,7 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
     def default_llm() -> LLMClient:
         if not settings.gemini_api_key:
             raise HTTPException(503, "GEMINI_API_KEY is not set on the server.")
-        return GeminiClient(settings.gemini_api_key, settings.gemini_model)
+        return GeminiClient(settings.gemini_api_key, settings.gemini_model, settings.gemini_thinking_level)
 
     app.state.llm_factory = llm_factory or default_llm
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"],

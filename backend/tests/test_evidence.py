@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytest
+
 from app.evidence import find_span, guard, years_in
 from app.schemas import Extraction
 
@@ -120,3 +122,18 @@ def test_relative_deadline_without_received_date_rejected():
     text = "Submit by today EOD."
     ex = make_extraction(deadline=ev("2026-10-07T23:59", "Submit by today EOD."))
     assert guard(ex, text).issues[0].field == "deadline"
+
+
+# 2026-10-07 is a Wednesday.
+@pytest.mark.parametrize("quote, deadline, ok", [
+    ("Register by Friday, 5 PM.", "2026-10-09T17:00", True),
+    ("Register by Fri 5 PM.", "2026-10-09T17:00", True),
+    ("Register by Friday, 5 PM.", "2026-10-16T17:00", False),   # a week off
+    ("Last date: this Monday.", "2026-10-12T23:59", True),
+    ("Register by next Friday.", "2026-10-09T23:59", False),    # ambiguous
+    ("Register by Wednesday.", "2026-10-07T23:59", False),      # same weekday: today or next week?
+])
+def test_weekday_deadlines(quote, deadline, ok):
+    ex = make_extraction(deadline=ev(deadline, quote))
+    issues = guard(ex, quote, received_at=datetime(2026, 10, 7, 9, 0)).issues
+    assert (issues == []) is ok, issues

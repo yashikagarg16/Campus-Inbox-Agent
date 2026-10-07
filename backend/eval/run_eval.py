@@ -44,7 +44,7 @@ def predict(records: list[dict]) -> list[dict]:
     settings = Settings.from_env()
     if not settings.gemini_api_key:
         sys.exit("GEMINI_API_KEY is not set. Use --replay to score saved predictions instead.")
-    client = GeminiClient(settings.gemini_api_key, settings.gemini_model)
+    client = GeminiClient(settings.gemini_api_key, settings.gemini_model, settings.gemini_thinking_level)
     out = []
     for rec in records:
         try:

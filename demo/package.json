@@ -1,0 +1,11 @@
+{
+  "name": "campus-inbox-agent-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "record": "node record-demo.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

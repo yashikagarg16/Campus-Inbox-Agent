@@ -28,7 +28,8 @@ Every extracted value must come with a quote from the email. A field is rejected
 - the quote isn't in the email (whitespace, case, smart quotes and dashes are normalised), or
 - the value isn't in its own quote: a CGPA of 8.5 needs "8.5" in the quote, batch 2026 needs 2026
   or a range like 2026-2028, a form link must appear in the email, and a deadline's day must be in
-  its quote (or the quote says "today"/"tomorrow" and the date matches the received date), or
+  its quote (or the quote says "today", "tomorrow" or a weekday like "by Friday" and the date matches
+  the received date; "next Friday" is ambiguous and rejected), or
 - the deadline is before the date the email arrived.
 
 The LLM gets another try with the rejection reasons. If a field still fails, it is blanked, and
@@ -76,6 +77,10 @@ uvicorn app.main:create_app --factory --reload
 ```
 
 Migrations run automatically on startup. API docs: http://localhost:8000/docs
+
+The default model is `gemini-3.8-flash` (`GEMINI_MODEL` to change it; `GEMINI_THINKING_LEVEL=low`
+makes extraction faster and cheaper). Gemini 3 models reject sampling parameters such as
+`temperature`, so none are sent.
 
 Frontend (Node 20+):
 
@@ -149,6 +154,21 @@ The report separates **missed** fields (safe: they show up as needs review) from
 **spurious** ones (dangerous), confident wrong verdicts from abstentions, and missed or invented
 opportunities in digest emails. CI runs the eval when a `GEMINI_API_KEY` repository secret exists.
 
+## Demo video
+
+`demo/record-demo.mjs` drives the real app in Microsoft Edge with Playwright and records a narrated
+walkthrough (made-up profile, synthetic emails, real Gemini extraction):
+
+```bash
+cd demo
+npm install
+npx playwright install ffmpeg
+npm run record                  # needs GEMINI_API_KEY in backend/.env; writes demo/out/*.webm
+```
+
+It starts a fresh backend and frontend, so stop any running dev servers first (or pass
+`-- --no-start` to use them). `DEMO_SNAPSHOTS=1` also saves a screenshot per step for review.
+
 ## Deploy
 
 **Backend + database on Render**: New › Blueprint › this repo. `render.yaml` creates the API and a
@@ -174,8 +194,8 @@ Review the generated file in `migrations/versions/`. CI fails if models and migr
 
 - Branch aliases cover common Indian B.Tech names. Anything else becomes needs review until you add
   your own aliases on the profile page.
-- Deadlines without a time default to 23:59 IST. Relative dates beyond "today"/"tomorrow" ("by
-  Friday") are rejected and shown as unclear.
+- Deadlines without a time default to 23:59 IST. Ambiguous relative dates ("next Friday", or
+  "Friday" in an email sent on a Friday) are shown as unclear rather than guessed.
 - The form itself is never fetched, so drafting needs you to paste the questions.
 - The eval numbers depend entirely on your labeled set; one college's email style won't generalise.
 

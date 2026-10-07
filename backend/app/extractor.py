@@ -66,7 +66,7 @@ Rules:
 - If the email does not clearly state something, use {{"value": null, "evidence": null}}. Never guess.
 - Expand batch ranges: "2026-2028" means [2026, 2027, 2028].
 - deadline: the email was received on {received}. Use that to pick the year when the email omits it,
-  and to resolve "today" or "tomorrow". If no time is given, use 23:59.
+  and to resolve "today", "tomorrow" or a weekday such as "by Friday". If no time is given, use 23:59.
 - If eligibility is "all branches", use ["All branches"].
 - Put eligibility conditions that don't fit the fields above (e.g. "strong academic record", gap years,
   gender, location) in other_criteria.
@@ -234,18 +234,19 @@ def draft_answers(client: LLMClient, profile_json: str, opportunity_json: str, q
 
 
 class GeminiClient:
-    def __init__(self, api_key: str, model: str):
+    def __init__(self, api_key: str, model: str, thinking_level: str | None = None):
         from google import genai
 
         self._client = genai.Client(api_key=api_key)
         self._model = model
+        self._thinking_level = thinking_level
 
     def generate(self, prompt: str) -> str:
         from google.genai import types
 
-        response = self._client.models.generate_content(
-            model=self._model,
-            contents=prompt,
-            config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0),
-        )
+        # Gemini 3+ rejects sampling parameters such as temperature; leave them unset.
+        config = types.GenerateContentConfig(response_mime_type="application/json")
+        if self._thinking_level:
+            config.thinking_config = types.ThinkingConfig(thinking_level=self._thinking_level)
+        response = self._client.models.generate_content(model=self._model, contents=prompt, config=config)
         return response.text or ""

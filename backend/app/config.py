@@ -18,7 +18,9 @@ def normalize_database_url(url: str) -> str:
 class Settings:
     database_url: str = "sqlite:///./campus_inbox.db"
     gemini_api_key: str | None = None
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3.8-flash"
+    # "low" | "medium" | "high"; unset uses the model's default (medium).
+    gemini_thinking_level: str | None = None
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173"])
     # If set, every endpoint except /health requires "Authorization: Bearer <app_token>".
     app_token: str | None = None
@@ -43,6 +45,7 @@ class Settings:
             database_url=normalize_database_url(env("DATABASE_URL", cls.database_url)),
             gemini_api_key=env("GEMINI_API_KEY") or None,
             gemini_model=env("GEMINI_MODEL") or cls.gemini_model,
+            gemini_thinking_level=env("GEMINI_THINKING_LEVEL") or None,
             cors_origins=[o.strip() for o in env("CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()],
             app_token=env("APP_TOKEN") or None,
             migrate_on_startup=env("MIGRATE_ON_STARTUP", "true").lower() != "false",

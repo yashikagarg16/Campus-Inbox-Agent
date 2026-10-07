@@ -35,7 +35,7 @@ def main() -> None:
     Session = make_sessionmaker(settings.database_url, migrate=settings.migrate_on_startup)
     since = (local_now() - timedelta(days=args.days)).date()
     with Session() as session:
-        result = sync_imap(session, GeminiClient(settings.gemini_api_key, settings.gemini_model),
+        result = sync_imap(session, GeminiClient(settings.gemini_api_key, settings.gemini_model, settings.gemini_thinking_level),
                            settings, since, limit=args.limit)
     print(f"fetched {result.fetched}, new {result.new}, duplicates {result.duplicates}, failed {result.failed}")
 
