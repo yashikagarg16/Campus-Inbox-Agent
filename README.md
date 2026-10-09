@@ -5,6 +5,21 @@ eligibility, form link), checks eligibility against your profile **in plain code
 exact sentence from the email behind every decision. When it can't be sure, it says
 **needs review** instead of guessing. It never submits anything for you.
 
+## Demo and status
+
+**[Watch the 2-minute demo (docs/demo.webm)](docs/demo.webm)**: real Gemini extraction on a made-up
+profile and synthetic emails. It shows an "8.5+ out of 10" email marked *Not eligible* with its sentence
+highlighted, a digest email split into three companies, a vague criterion marked *Needs review*, and
+drafted form answers that say `[NEEDS INPUT]` instead of inventing facts.
+
+| | Status |
+|---|---|
+| Pipeline (extraction, evidence guard, rule engine, API, dashboard) | Working; 135 backend + 15 frontend tests; CI on SQLite and PostgreSQL |
+| Real Gemini run | Working (`gemini-3.8-flash` with retries and a lite fallback) |
+| Accuracy | Measured only on 8 synthetic emails I wrote (9/9 verdicts correct). **Not a benchmark.** |
+| Real-email eval (60–100 labeled college emails) | In progress. College Outlook needs admin consent for API access, so emails are collected as `.eml` downloads |
+| Deployment | Render + Vercel config ready; not deployed yet |
+
 ## How it works
 
 ```
