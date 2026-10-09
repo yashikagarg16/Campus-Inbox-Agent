@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -40,24 +41,28 @@ def _received(rec: dict) -> datetime | None:
     return datetime.fromisoformat(rec["received_at"]) if rec.get("received_at") else None
 
 
-def predict(records: list[dict]) -> list[dict]:
+def _predict_one(settings: Settings, rec: dict) -> dict:
+    client = settings.gemini_client()  # one client per thread
+    try:
+        outcome = extract(client, clean_text(rec["text"]), _received(rec))
+        result = {"id": rec["id"], "attempts": outcome.attempts, "error": None, "opportunities": [
+            {"extraction": o.extraction.model_dump(mode="json"),
+             "issues": [i.model_dump(mode="json") for i in o.issues]}
+            for o in outcome.opportunities
+        ]}
+    except Exception as e:  # ExtractionFailed, or the API giving up after retries
+        attempts = len(getattr(e, "raw_responses", []))
+        result = {"id": rec["id"], "attempts": attempts, "error": f"{type(e).__name__}: {e}"[:500], "opportunities": []}
+    print(f"{rec['id']}: {'ok' if result['error'] is None else 'FAILED'}", file=sys.stderr, flush=True)
+    return result
+
+
+def predict(records: list[dict], workers: int = 8) -> list[dict]:
     settings = Settings.from_env()
     if not settings.gemini_api_key:
         sys.exit("GEMINI_API_KEY is not set. Use --replay to score saved predictions instead.")
-    client = settings.gemini_client()
-    out = []
-    for rec in records:
-        try:
-            outcome = extract(client, clean_text(rec["text"]), _received(rec))
-            out.append({"id": rec["id"], "attempts": outcome.attempts, "error": None, "opportunities": [
-                {"extraction": o.extraction.model_dump(mode="json"),
-                 "issues": [i.model_dump(mode="json") for i in o.issues]}
-                for o in outcome.opportunities
-            ]})
-        except ExtractionFailed as e:
-            out.append({"id": rec["id"], "attempts": len(e.raw_responses), "error": str(e), "opportunities": []})
-        print(f"{rec['id']}: {'ok' if out[-1]['error'] is None else 'FAILED'}", file=sys.stderr)
-    return out
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return list(pool.map(lambda rec: _predict_one(settings, rec), records))
 
 
 def expected_opportunities(rec: dict) -> list[dict]:
@@ -92,6 +97,9 @@ def main() -> None:
     ap.add_argument("--profile", type=Path, default=HERE / "data" / "eval_profile.json")
     ap.add_argument("--replay", type=Path, help="score saved predictions instead of calling the LLM")
     ap.add_argument("--out", type=Path, default=HERE / "out")
+    ap.add_argument("--workers", type=int, default=8, help="emails processed in parallel")
+    ap.add_argument("--retry-failed", action="store_true",
+                    help="re-run only emails that failed in out/predictions.jsonl (e.g. after a quota error)")
     args = ap.parse_args()
 
     records = load_jsonl(args.data)
@@ -100,8 +108,16 @@ def main() -> None:
 
     if args.replay:
         predictions = load_jsonl(args.replay)
+    elif args.retry_failed:
+        previous = load_jsonl(args.out / "predictions.jsonl")
+        failed = {p["id"] for p in previous if p.get("error")}
+        redone = {p["id"]: p for p in predict([r for r in records if r["id"] in failed], args.workers)}
+        predictions = [redone.get(p["id"], p) for p in previous]
+        with (args.out / "predictions.jsonl").open("w", encoding="utf-8") as f:
+            for p in predictions:
+                f.write(json.dumps(p) + "\n")
     else:
-        predictions = predict(records)
+        predictions = predict(records, args.workers)
         with (args.out / "predictions.jsonl").open("w", encoding="utf-8") as f:
             for p in predictions:
                 f.write(json.dumps(p) + "\n")

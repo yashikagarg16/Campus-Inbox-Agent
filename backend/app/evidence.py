@@ -113,7 +113,7 @@ def _relative_day(evidence: str, received_at: datetime | None) -> tuple[bool, in
     phrases resolve: "next Friday", or "Friday" in an email sent on a Friday, could
     mean two different dates, so they are reported as a problem instead of guessed.
     """
-    text = normalize(evidence)
+    text = re.sub(r"https?://\S+", " ", normalize(evidence))  # digits in links aren't dates
     if _NUMBER_RE.search(re.sub(r"\d{1,2}(:\d{2})?\s*(am|pm)|\d{1,2}:\d{2}", "", text)):
         return False, None, None  # an explicit date is present; check that instead
     days = next((d for phrase, d in _RELATIVE_DAYS if re.search(rf"\b{phrase}\b", text)), None)

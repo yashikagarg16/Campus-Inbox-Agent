@@ -14,9 +14,9 @@ drafted form answers that say `[NEEDS INPUT]` instead of inventing facts.
 
 | | Status |
 |---|---|
-| Pipeline (extraction, evidence guard, rule engine, API, dashboard) | Working; 135 backend + 15 frontend tests; CI on SQLite and PostgreSQL |
+| Pipeline (extraction, evidence guard, rule engine, API, dashboard) | Working; 136 backend + 15 frontend tests; CI on SQLite and PostgreSQL |
 | Real Gemini run | Working (`gemini-3.8-flash` with retries and a lite fallback) |
-| Accuracy | Measured only on 8 synthetic emails written for testing (9/9 verdicts correct). **Not a benchmark.** |
+| Accuracy (synthetic) | 36 synthetic emails written for testing (38 opportunities, incl. digests, extensions, reminders, 4-point GPA, relaxable cutoffs, M.Tech-only drives, notices): **35/38 verdicts correct, 3 'needs review', 0 confidently wrong**; all 38 opportunities found. **Not a benchmark**: these aren't real emails. |
 | Real-email eval (60–100 labeled college emails) | In progress. College Outlook needs admin consent for API access, so emails are collected as `.eml` downloads |
 | Deployment | Render + Vercel config ready; not deployed yet |
 

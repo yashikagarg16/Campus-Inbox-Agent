@@ -137,3 +137,9 @@ def test_weekday_deadlines(quote, deadline, ok):
     ex = make_extraction(deadline=ev(deadline, quote))
     issues = guard(ex, quote, received_at=datetime(2026, 10, 7, 9, 0)).issues
     assert (issues == []) is ok, issues
+
+
+def test_weekday_deadline_quote_with_link_digits():
+    quote = "Register by this Friday, 5 PM: https://forms.gle/synthWren030"
+    ex = make_extraction(deadline=ev("2026-10-09T17:00", quote))
+    assert guard(ex, quote, received_at=datetime(2026, 10, 7, 8, 0)).issues == []
