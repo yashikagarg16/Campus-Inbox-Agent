@@ -14,3 +14,4 @@ backend/ci_check.db
 *.tsbuildinfo
 demo/out/
 backend/.graph_token_cache.json
+resume/
