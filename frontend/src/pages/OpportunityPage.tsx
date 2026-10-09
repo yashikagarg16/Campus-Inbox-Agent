@@ -158,9 +158,11 @@ export function OpportunityPage() {
       <Card className="space-y-3">
         <AuditLog opportunityId={opp.id} />
         <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
-          <Button variant="danger" onClick={remove}>
-            Delete email
-          </Button>
+          {!config?.demo_mode && (
+            <Button variant="danger" onClick={remove}>
+              Delete email
+            </Button>
+          )}
           <ErrorBox error={deleteError} />
         </div>
       </Card>

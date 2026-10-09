@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, type OpportunitySummary, type Verdict } from "../api";
 import { useServerConfig } from "../App";
@@ -34,6 +34,10 @@ export function DashboardPage() {
   const { config, error: configError } = useServerConfig();
   const [filter, setFilter] = useState<Filter>("all");
   const [showPast, setShowPast] = useState(false);
+  // The demo's synthetic emails have fixed October 2026 deadlines, so show them all.
+  useEffect(() => {
+    if (config?.demo_mode) setShowPast(true);
+  }, [config?.demo_mode]);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<unknown>(null);

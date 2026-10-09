@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from . import rules
 from .extractor import ExtractionFailed, LLMClient, OpportunityOutcome, draft_answers, draft_warnings, extract
+from .evidence import guard
 from .imap_sync import fetch_raw_messages
 from .models import AuditEvent, DecisionRow, DraftRow, EmailRow, OpportunityRow, ProfileRow, RuleRow
 from .parsing import clean_text, parse_eml
@@ -194,6 +195,31 @@ def sync_imap(session: Session, client: LLMClient, settings, since: date, limit:
     messages = fetch(settings.imap_host, settings.imap_user, settings.imap_password, since,
                      mailbox=settings.imap_mailbox, sender=settings.imap_sender_filter, limit=limit)
     return sync_messages(session, client, messages, since, "imap")
+
+
+# --- demo seed --------------------------------------------------------------------------------
+
+def seed_demo(session: Session, seed: dict) -> int:
+    """Load synthetic emails with stored (real) extractions. No LLM calls. Skips if data exists."""
+    if session.scalars(select(EmailRow).limit(1)).first() is not None:
+        return 0
+    profile = Profile.model_validate(seed["profile"])
+    session.add(ProfileRow(id=1, data=profile.model_dump(mode="json")))
+    for item in seed["emails"]:
+        cleaned = clean_text(item["text"])
+        received = datetime.fromisoformat(item["received_at"]) if item.get("received_at") else None
+        email = EmailRow(subject=item.get("subject"), raw_text=item["text"], cleaned_text=cleaned, received_at=received,
+                         content_hash=content_hash(cleaned), source="demo", status="extracted")
+        session.add(email)
+        for position, opp in enumerate(item["opportunities"]):
+            checked = guard(Extraction.model_validate(opp["extraction"]), cleaned, received)  # recompute spans
+            issues = [FieldIssue.model_validate(i) for i in opp["issues"]] + checked.issues
+            row = _store_opportunity(email, position, OpportunityOutcome(checked.extraction, issues, checked.spans))
+            session.add(row)
+            session.flush()
+            evaluate_opportunity(session, row, profile)
+    session.commit()
+    return len(seed["emails"])
 
 
 # --- drafts ------------------------------------------------------------------------------------

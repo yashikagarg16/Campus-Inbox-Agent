@@ -94,6 +94,7 @@ export interface AuditEvent {
 }
 
 export interface ServerConfig {
+  demo_mode?: boolean;
   llm_configured: boolean;
   imap_configured: boolean; // any inbox sync is set up
   mail_source?: "graph" | "imap" | null;

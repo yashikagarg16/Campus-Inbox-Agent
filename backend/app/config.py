@@ -38,6 +38,8 @@ class Settings:
     # The client ID comes from an app registration; see README "Outlook / Microsoft 365".
     ms_client_id: str | None = None
     ms_tenant: str = "organizations"
+    # Public read-only demo: seeds synthetic emails on startup and rejects every write.
+    demo_mode: bool = False
 
     def gemini_client(self):
         from .extractor import GeminiClient
@@ -76,4 +78,5 @@ class Settings:
             imap_sender_filter=env("IMAP_SENDER_FILTER") or None,
             ms_client_id=env("MS_CLIENT_ID") or None,
             ms_tenant=env("MS_TENANT") or cls.ms_tenant,
+            demo_mode=env("DEMO_MODE", "false").lower() == "true",
         )

@@ -1,0 +1,2443 @@
+{
+ "note": "Synthetic emails with real Gemini extractions (eval run). Not real placement mail.",
+ "profile": {
+  "batch": 2027,
+  "cgpa": 8.4,
+  "cgpa_scale": 10,
+  "branch": "CSE",
+  "tenth_percent": 92,
+  "twelfth_percent": 88,
+  "active_backlogs": 0,
+  "skills": [
+   "Python",
+   "SQL"
+  ],
+  "name": "Demo Student",
+  "resume_summary": "Built a stock-trading backtester in Python with FastAPI and a React dashboard for a college fest."
+ },
+ "emails": [
+  {
+   "id": "syn-001",
+   "subject": "Acme Analytics - SDE Intern",
+   "received_at": "2026-10-07T09:00",
+   "text": "Dear Students,\n\nAcme Analytics is hiring for the role of Software Engineer Intern.\n\nEligibility:\nBatch 2027 and 2028 only.\nMinimum CGPA 8.0 required.\nBranches: CSE, IT, ECE\n\nLast date: 20 Oct, 5 PM.\nRegister here: https://forms.gle/synthAcme001\n\nRegards,\nTraining & Placement Cell",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Acme Analytics",
+       "evidence": "Acme Analytics is hiring for the role of Software Engineer Intern."
+      },
+      "role": {
+       "value": "Software Engineer Intern",
+       "evidence": "Acme Analytics is hiring for the role of Software Engineer Intern."
+      },
+      "deadline": {
+       "value": "2026-10-20T17:00:00",
+       "evidence": "Last date: 20 Oct, 5 PM."
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthAcme001",
+       "evidence": "Register here: https://forms.gle/synthAcme001"
+      },
+      "batches": {
+       "value": [
+        2027,
+        2028
+       ],
+       "evidence": "Batch 2027 and 2028 only."
+      },
+      "min_cgpa": {
+       "value": 8.0,
+       "evidence": "Minimum CGPA 8.0 required."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "CSE",
+        "IT",
+        "ECE"
+       ],
+       "evidence": "Branches: CSE, IT, ECE"
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-002",
+   "subject": "Quantly Research Internship",
+   "received_at": "2026-10-07T11:30",
+   "text": "Hi all,\nQuantly is offering a Quant Research Internship for the 2027 and 2028 batches.\nPlease register only if you're 8.5+ out of 10.\nFill the form by 12 October 2026, 11:59 PM: https://forms.gle/synthQuant002\nThanks,\nPlacement Office",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Quantly",
+       "evidence": "Quantly is offering a Quant Research Internship for the 2027 and 2028 batches."
+      },
+      "role": {
+       "value": "Quant Research Internship",
+       "evidence": "Quantly is offering a Quant Research Internship for the 2027 and 2028 batches."
+      },
+      "deadline": {
+       "value": "2026-10-12T23:59:00",
+       "evidence": "Fill the form by 12 October 2026, 11:59 PM: https://forms.gle/synthQuant002"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthQuant002",
+       "evidence": "Fill the form by 12 October 2026, 11:59 PM: https://forms.gle/synthQuant002"
+      },
+      "batches": {
+       "value": [
+        2027,
+        2028
+       ],
+       "evidence": "Quantly is offering a Quant Research Internship for the 2027 and 2028 batches."
+      },
+      "min_cgpa": {
+       "value": 8.5,
+       "evidence": "Please register only if you're 8.5+ out of 10."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-003",
+   "subject": "Brightpath - Product Analyst",
+   "received_at": "2026-10-06T15:00",
+   "text": "Brightpath Labs is visiting campus for Product Analyst (Full Time).\nOpen to all branches, batch 2027.\nStudents with a strong academic record are encouraged to apply.\nApply before 15/10/2026 6 PM at https://brightpath.example.com/apply\n- TPO",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Brightpath Labs",
+       "evidence": "Brightpath Labs is visiting campus for Product Analyst (Full Time)."
+      },
+      "role": {
+       "value": "Product Analyst",
+       "evidence": "Brightpath Labs is visiting campus for Product Analyst (Full Time)."
+      },
+      "deadline": {
+       "value": "2026-10-15T18:00:00",
+       "evidence": "Apply before 15/10/2026 6 PM at https://brightpath.example.com/apply"
+      },
+      "form_link": {
+       "value": "https://brightpath.example.com/apply",
+       "evidence": "Apply before 15/10/2026 6 PM at https://brightpath.example.com/apply"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Open to all branches, batch 2027."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "All branches"
+       ],
+       "evidence": "Open to all branches, batch 2027."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "strong academic record",
+        "evidence": "Students with a strong academic record are encouraged to apply."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-004",
+   "subject": "Northwind Graduate Engineer Trainee",
+   "received_at": "2026-10-05T10:00",
+   "text": "Northwind Systems - Graduate Engineer Trainee\n\nEligibility criteria:\n* 60% or above in 10th and 12th\n* 60% or equivalent CGPA in graduation\n* No active backlogs\n* Batches 2026-2028\n\nDeadline: 18th Oct 2026, 10:00 AM\nLink: https://forms.gle/synthNorth004",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Northwind Systems",
+       "evidence": "Northwind Systems - Graduate Engineer Trainee"
+      },
+      "role": {
+       "value": "Graduate Engineer Trainee",
+       "evidence": "Northwind Systems - Graduate Engineer Trainee"
+      },
+      "deadline": {
+       "value": "2026-10-18T10:00:00",
+       "evidence": "Deadline: 18th Oct 2026, 10:00 AM"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthNorth004",
+       "evidence": "Link: https://forms.gle/synthNorth004"
+      },
+      "batches": {
+       "value": [
+        2026,
+        2027,
+        2028
+       ],
+       "evidence": "* Batches 2026-2028"
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": 60.0,
+       "evidence": "* 60% or above in 10th and 12th"
+      },
+      "min_12th_percent": {
+       "value": 60.0,
+       "evidence": "* 60% or above in 10th and 12th"
+      },
+      "max_active_backlogs": {
+       "value": 0,
+       "evidence": "* No active backlogs"
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "60% or equivalent CGPA in graduation",
+        "evidence": "* 60% or equivalent CGPA in graduation"
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-005",
+   "subject": "Acme Analytics - OA results",
+   "received_at": "2026-10-04T18:00",
+   "text": "Dear students,\nThe results of the Acme Analytics online assessment are attached. Shortlisted students should report to Seminar Hall 2 at 9 AM tomorrow for interviews.\nRegards,\nT&P Cell",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": false,
+      "company": {
+       "value": "Acme Analytics",
+       "evidence": "The results of the Acme Analytics online assessment are attached."
+      },
+      "role": {
+       "value": null,
+       "evidence": null
+      },
+      "deadline": {
+       "value": null,
+       "evidence": null
+      },
+      "form_link": {
+       "value": null,
+       "evidence": null
+      },
+      "batches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-006",
+   "subject": "Ironforge Core Engineering",
+   "received_at": "2026-10-07T08:00",
+   "text": "Ironforge Heavy Industries is hiring Design Engineers.\nEligible branches: Mechanical and Civil Engineering only.\nBatch: 2027.\nLast date to register: 22 Oct 2026, 5 PM - https://forms.gle/synthIron006",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Ironforge Heavy Industries",
+       "evidence": "Ironforge Heavy Industries is hiring Design Engineers."
+      },
+      "role": {
+       "value": "Design Engineers",
+       "evidence": "Ironforge Heavy Industries is hiring Design Engineers."
+      },
+      "deadline": {
+       "value": "2026-10-22T17:00:00",
+       "evidence": "Last date to register: 22 Oct 2026, 5 PM - https://forms.gle/synthIron006"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthIron006",
+       "evidence": "Last date to register: 22 Oct 2026, 5 PM - https://forms.gle/synthIron006"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Batch: 2027."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "Mechanical",
+        "Civil Engineering"
+       ],
+       "evidence": "Eligible branches: Mechanical and Civil Engineering only."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-007",
+   "subject": "Weekly opportunities digest",
+   "received_at": "2026-10-07T10:00",
+   "text": "Dear all,\n\nThis week's openings (open to batch 2027 only):\n\n1. Lumen Robotics - Embedded Software Intern\nBranches: ECE, EEE\nApply by 14 Oct 2026, 5 PM: https://forms.gle/synthLumen007\n\n2. Cedar Bank - Data Analyst Intern\nMinimum CGPA 7.5. All branches.\nApply by 16 Oct 2026, 5 PM: https://forms.gle/synthCedar007\n\nT&P Cell",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Lumen Robotics",
+       "evidence": "1. Lumen Robotics - Embedded Software Intern"
+      },
+      "role": {
+       "value": "Embedded Software Intern",
+       "evidence": "1. Lumen Robotics - Embedded Software Intern"
+      },
+      "deadline": {
+       "value": "2026-10-14T17:00:00",
+       "evidence": "Apply by 14 Oct 2026, 5 PM: https://forms.gle/synthLumen007"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthLumen007",
+       "evidence": "Apply by 14 Oct 2026, 5 PM: https://forms.gle/synthLumen007"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "This week's openings (open to batch 2027 only):"
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "ECE",
+        "EEE"
+       ],
+       "evidence": "Branches: ECE, EEE"
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    },
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Cedar Bank",
+       "evidence": "2. Cedar Bank - Data Analyst Intern"
+      },
+      "role": {
+       "value": "Data Analyst Intern",
+       "evidence": "2. Cedar Bank - Data Analyst Intern"
+      },
+      "deadline": {
+       "value": "2026-10-16T17:00:00",
+       "evidence": "Apply by 16 Oct 2026, 5 PM: https://forms.gle/synthCedar007"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthCedar007",
+       "evidence": "Apply by 16 Oct 2026, 5 PM: https://forms.gle/synthCedar007"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "This week's openings (open to batch 2027 only):"
+      },
+      "min_cgpa": {
+       "value": 7.5,
+       "evidence": "Minimum CGPA 7.5."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "All branches"
+       ],
+       "evidence": "All branches."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-008",
+   "subject": "URGENT: Pinecone Labs registration",
+   "received_at": "2026-10-07T13:00",
+   "text": "Pinecone Labs - Backend Developer Intern\nOnly 2027 batch students with CGPA 8 and above.\nRegistration closes tomorrow at 10 AM. Link: https://forms.gle/synthPine008",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Pinecone Labs",
+       "evidence": "Pinecone Labs - Backend Developer Intern"
+      },
+      "role": {
+       "value": "Backend Developer Intern",
+       "evidence": "Pinecone Labs - Backend Developer Intern"
+      },
+      "deadline": {
+       "value": "2026-10-08T10:00:00",
+       "evidence": "Registration closes tomorrow at 10 AM."
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthPine008",
+       "evidence": "Link: https://forms.gle/synthPine008"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Only 2027 batch students with CGPA 8 and above."
+      },
+      "min_cgpa": {
+       "value": 8.0,
+       "evidence": "Only 2027 batch students with CGPA 8 and above."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-009",
+   "subject": "Northstar Fintech | SDE Intern",
+   "received_at": "2026-10-08T09:00",
+   "text": "Company: Northstar Fintech\nRole: SDE Intern\nStipend: 50,000 per month\nEligibility: B.Tech CSE/IT/ECE, 2027 batch, CGPA >= 7.5, no active backlogs\nDeadline: 13/10/2026 11:00 AM\nForm: https://forms.gle/synthNorthstar009",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Northstar Fintech",
+       "evidence": "Company: Northstar Fintech"
+      },
+      "role": {
+       "value": "SDE Intern",
+       "evidence": "Role: SDE Intern"
+      },
+      "deadline": {
+       "value": "2026-10-13T11:00:00",
+       "evidence": "Deadline: 13/10/2026 11:00 AM"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthNorthstar009",
+       "evidence": "Form: https://forms.gle/synthNorthstar009"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Eligibility: B.Tech CSE/IT/ECE, 2027 batch, CGPA >= 7.5, no active backlogs"
+      },
+      "min_cgpa": {
+       "value": 7.5,
+       "evidence": "Eligibility: B.Tech CSE/IT/ECE, 2027 batch, CGPA >= 7.5, no active backlogs"
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "CSE",
+        "IT",
+        "ECE"
+       ],
+       "evidence": "Eligibility: B.Tech CSE/IT/ECE, 2027 batch, CGPA >= 7.5, no active backlogs"
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": 0,
+       "evidence": "Eligibility: B.Tech CSE/IT/ECE, 2027 batch, CGPA >= 7.5, no active backlogs"
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-010",
+   "subject": "Kestrel Software hiring 2027",
+   "received_at": "2026-10-08T10:30",
+   "text": "Dear Students,\nKestrel Software is hiring Associate Software Engineers from the 2027 batch.\nAcademic criteria: minimum 7.5 CGPA in B.Tech.\nApply by 16 October 2026, 5 PM: https://forms.gle/synthKestrel010\nRegards, CDC",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Kestrel Software",
+       "evidence": "Kestrel Software is hiring Associate Software Engineers from the 2027 batch."
+      },
+      "role": {
+       "value": "Associate Software Engineers",
+       "evidence": "Kestrel Software is hiring Associate Software Engineers from the 2027 batch."
+      },
+      "deadline": {
+       "value": "2026-10-16T17:00:00",
+       "evidence": "Apply by 16 October 2026, 5 PM: https://forms.gle/synthKestrel010"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthKestrel010",
+       "evidence": "Apply by 16 October 2026, 5 PM: https://forms.gle/synthKestrel010"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Kestrel Software is hiring Associate Software Engineers from the 2027 batch."
+      },
+      "min_cgpa": {
+       "value": 7.5,
+       "evidence": "Academic criteria: minimum 7.5 CGPA in B.Tech."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "B.Tech degree required",
+        "evidence": "Academic criteria: minimum 7.5 CGPA in B.Tech."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-011",
+   "subject": "Deadline extended: Orbit Labs",
+   "received_at": "2026-10-08T12:00",
+   "text": "Deadline extended!\nRegistration for Orbit Labs - Data Engineer Intern now closes on 15 Oct 2026, 6 PM (earlier 10 Oct).\nLink remains the same: https://forms.gle/synthOrbit011",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Orbit Labs",
+       "evidence": "Registration for Orbit Labs - Data Engineer Intern now closes on 15 Oct 2026, 6 PM (earlier 10 Oct)."
+      },
+      "role": {
+       "value": "Data Engineer Intern",
+       "evidence": "Registration for Orbit Labs - Data Engineer Intern now closes on 15 Oct 2026, 6 PM (earlier 10 Oct)."
+      },
+      "deadline": {
+       "value": "2026-10-15T18:00:00",
+       "evidence": "Registration for Orbit Labs - Data Engineer Intern now closes on 15 Oct 2026, 6 PM (earlier 10 Oct)."
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthOrbit011",
+       "evidence": "Link remains the same: https://forms.gle/synthOrbit011"
+      },
+      "batches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-012",
+   "subject": "Reminder: Pinewood Analytics registration",
+   "received_at": "2026-10-09T19:00",
+   "text": "Gentle reminder: Pinewood Analytics (Business Analyst Intern) registration closes tonight at 10 PM.\nRegister: https://forms.gle/synthPinewood012",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Pinewood Analytics",
+       "evidence": "Gentle reminder: Pinewood Analytics (Business Analyst Intern) registration closes tonight at 10 PM."
+      },
+      "role": {
+       "value": "Business Analyst Intern",
+       "evidence": "Gentle reminder: Pinewood Analytics (Business Analyst Intern) registration closes tonight at 10 PM."
+      },
+      "deadline": {
+       "value": "2026-10-09T22:00:00",
+       "evidence": "Gentle reminder: Pinewood Analytics (Business Analyst Intern) registration closes tonight at 10 PM."
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthPinewood012",
+       "evidence": "Register: https://forms.gle/synthPinewood012"
+      },
+      "batches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-013",
+   "subject": "Lattice Systems - Women in Tech",
+   "received_at": "2026-10-07T11:00",
+   "text": "Lattice Systems invites applications for its Women in Tech Software Engineering Internship.\nOpen to female students of the 2027 batch from CSE and IT with CGPA 7 and above.\nLast date: 17 Oct 2026. Apply: https://forms.gle/synthLattice013",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Lattice Systems",
+       "evidence": "Lattice Systems invites applications for its Women in Tech Software Engineering Internship."
+      },
+      "role": {
+       "value": "Software Engineering Internship",
+       "evidence": "Lattice Systems invites applications for its Women in Tech Software Engineering Internship."
+      },
+      "deadline": {
+       "value": "2026-10-17T23:59:00",
+       "evidence": "Last date: 17 Oct 2026."
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthLattice013",
+       "evidence": "Apply: https://forms.gle/synthLattice013"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Open to female students of the 2027 batch from CSE and IT with CGPA 7 and above."
+      },
+      "min_cgpa": {
+       "value": 7.0,
+       "evidence": "Open to female students of the 2027 batch from CSE and IT with CGPA 7 and above."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "CSE",
+        "IT"
+       ],
+       "evidence": "Open to female students of the 2027 batch from CSE and IT with CGPA 7 and above."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "Only for female students",
+        "evidence": "Open to female students of the 2027 batch from CSE and IT with CGPA 7 and above."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-014",
+   "subject": "Granite Cloud - Dream drive",
+   "received_at": "2026-10-06T09:30",
+   "text": "Granite Cloud is conducting a Dream category drive for Cloud Engineer (Full Time).\nEligibility: 2027 batch, CGPA 8.0 and above.\nStudents already placed in a Dream company are not eligible.\nRegister by 19 Oct 2026, 11:59 PM: https://forms.gle/synthGranite014",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Granite Cloud",
+       "evidence": "Granite Cloud is conducting a Dream category drive for Cloud Engineer (Full Time)."
+      },
+      "role": {
+       "value": "Cloud Engineer (Full Time)",
+       "evidence": "Granite Cloud is conducting a Dream category drive for Cloud Engineer (Full Time)."
+      },
+      "deadline": {
+       "value": "2026-10-19T23:59:00",
+       "evidence": "Register by 19 Oct 2026, 11:59 PM: https://forms.gle/synthGranite014"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthGranite014",
+       "evidence": "Register by 19 Oct 2026, 11:59 PM: https://forms.gle/synthGranite014"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Eligibility: 2027 batch, CGPA 8.0 and above."
+      },
+      "min_cgpa": {
+       "value": 8.0,
+       "evidence": "Eligibility: 2027 batch, CGPA 8.0 and above."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "Students already placed in a Dream company are not eligible.",
+        "evidence": "Students already placed in a Dream company are not eligible."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-015",
+   "subject": "Harbor Logistics GET",
+   "received_at": "2026-10-06T14:00",
+   "text": "Harbor Logistics - Graduate Engineer Trainee\nEligible batch: 2026 only.\n2-year service agreement, posting in Pune.\nApply by 14 Oct 2026: https://forms.gle/synthHarbor015",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Harbor Logistics",
+       "evidence": "Harbor Logistics - Graduate Engineer Trainee"
+      },
+      "role": {
+       "value": "Graduate Engineer Trainee",
+       "evidence": "Harbor Logistics - Graduate Engineer Trainee"
+      },
+      "deadline": {
+       "value": "2026-10-14T23:59:00",
+       "evidence": "Apply by 14 Oct 2026: https://forms.gle/synthHarbor015"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthHarbor015",
+       "evidence": "Apply by 14 Oct 2026: https://forms.gle/synthHarbor015"
+      },
+      "batches": {
+       "value": [
+        2026
+       ],
+       "evidence": "Eligible batch: 2026 only."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "2-year service agreement",
+        "evidence": "2-year service agreement, posting in Pune."
+       },
+       {
+        "value": "Posting in Pune",
+        "evidence": "2-year service agreement, posting in Pune."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-016",
+   "subject": "Quasar Research - M.Tech/MCA",
+   "received_at": "2026-10-07T16:00",
+   "text": "Quasar Research is hiring Research Associates.\nEligible: M.Tech and MCA students graduating in 2027.\nApply before 20 Oct 2026: https://forms.gle/synthQuasar016",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Quasar Research",
+       "evidence": "Quasar Research is hiring Research Associates."
+      },
+      "role": {
+       "value": "Research Associate",
+       "evidence": "Quasar Research is hiring Research Associates."
+      },
+      "deadline": {
+       "value": "2026-10-20T23:59:00",
+       "evidence": "Apply before 20 Oct 2026: https://forms.gle/synthQuasar016"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthQuasar016",
+       "evidence": "Apply before 20 Oct 2026: https://forms.gle/synthQuasar016"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Eligible: M.Tech and MCA students graduating in 2027."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "M.Tech",
+        "MCA"
+       ],
+       "evidence": "Eligible: M.Tech and MCA students graduating in 2027."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-017",
+   "subject": "Silverline Bank Tech Analyst",
+   "received_at": "2026-10-08T08:30",
+   "text": "Silverline Bank - Technology Analyst\nCriteria: minimum 85% in 10th and 12th, CGPA 8.0, 2027 batch.\nDeadline: 18 Oct 2026, 5 PM\nLink: https://forms.gle/synthSilver017",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Silverline Bank",
+       "evidence": "Silverline Bank - Technology Analyst"
+      },
+      "role": {
+       "value": "Technology Analyst",
+       "evidence": "Silverline Bank - Technology Analyst"
+      },
+      "deadline": {
+       "value": "2026-10-18T17:00:00",
+       "evidence": "Deadline: 18 Oct 2026, 5 PM"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthSilver017",
+       "evidence": "Link: https://forms.gle/synthSilver017"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Criteria: minimum 85% in 10th and 12th, CGPA 8.0, 2027 batch."
+      },
+      "min_cgpa": {
+       "value": 8.0,
+       "evidence": "Criteria: minimum 85% in 10th and 12th, CGPA 8.0, 2027 batch."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": 85.0,
+       "evidence": "Criteria: minimum 85% in 10th and 12th, CGPA 8.0, 2027 batch."
+      },
+      "min_12th_percent": {
+       "value": 85.0,
+       "evidence": "Criteria: minimum 85% in 10th and 12th, CGPA 8.0, 2027 batch."
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-018",
+   "subject": "Alder Consulting",
+   "received_at": "2026-10-08T09:15",
+   "text": "Alder Consulting is hiring Strategy Analysts (2027 batch).\nCandidates must have scored at least 90% in Class 12.\nApply by 21 Oct 2026: https://forms.gle/synthAlder018",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Alder Consulting",
+       "evidence": "Alder Consulting is hiring Strategy Analysts (2027 batch)."
+      },
+      "role": {
+       "value": "Strategy Analysts",
+       "evidence": "Alder Consulting is hiring Strategy Analysts (2027 batch)."
+      },
+      "deadline": {
+       "value": "2026-10-21T23:59:00",
+       "evidence": "Apply by 21 Oct 2026: https://forms.gle/synthAlder018"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthAlder018",
+       "evidence": "Apply by 21 Oct 2026: https://forms.gle/synthAlder018"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Alder Consulting is hiring Strategy Analysts (2027 batch)."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": 90.0,
+       "evidence": "Candidates must have scored at least 90% in Class 12."
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-019",
+   "subject": "Bluefin Systems - Java Developer",
+   "received_at": "2026-10-07T13:00",
+   "text": "Bluefin Systems - Java Developer Intern\nOpen to all branches, 2027 batch.\nMust know Java and Spring Boot.\nApply by 16 Oct 2026, 6 PM: https://forms.gle/synthBluefin019",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Bluefin Systems",
+       "evidence": "Bluefin Systems - Java Developer Intern"
+      },
+      "role": {
+       "value": "Java Developer Intern",
+       "evidence": "Bluefin Systems - Java Developer Intern"
+      },
+      "deadline": {
+       "value": "2026-10-16T18:00:00",
+       "evidence": "Apply by 16 Oct 2026, 6 PM: https://forms.gle/synthBluefin019"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthBluefin019",
+       "evidence": "Apply by 16 Oct 2026, 6 PM: https://forms.gle/synthBluefin019"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Open to all branches, 2027 batch."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "All branches"
+       ],
+       "evidence": "Open to all branches, 2027 batch."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": [
+        "Java",
+        "Spring Boot"
+       ],
+       "evidence": "Must know Java and Spring Boot."
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-020",
+   "subject": "CodeSprint 2026 hackathon",
+   "received_at": "2026-10-05T10:00",
+   "text": "Register for CodeSprint 2026, a 24-hour inter-college hackathon on 25 Oct.\nTeams of 2-4. Registration closes 18 Oct 2026: https://forms.gle/synthSprint020",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": null,
+       "evidence": null
+      },
+      "role": {
+       "value": "CodeSprint 2026",
+       "evidence": "Register for CodeSprint 2026, a 24-hour inter-college hackathon on 25 Oct."
+      },
+      "deadline": {
+       "value": "2026-10-18T23:59:00",
+       "evidence": "Registration closes 18 Oct 2026: https://forms.gle/synthSprint020"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthSprint020",
+       "evidence": "Registration closes 18 Oct 2026: https://forms.gle/synthSprint020"
+      },
+      "batches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "Teams of 2-4",
+        "evidence": "Teams of 2-4."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-021",
+   "subject": "PPT: Helix Bio",
+   "received_at": "2026-10-08T17:00",
+   "text": "Pre-placement talk by Helix Bio at 3 PM in the Main Auditorium on 12 Oct.\nAttendance is mandatory for all registered students.",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": false,
+      "company": {
+       "value": "Helix Bio",
+       "evidence": "Pre-placement talk by Helix Bio at 3 PM in the Main Auditorium on 12 Oct."
+      },
+      "role": {
+       "value": null,
+       "evidence": null
+      },
+      "deadline": {
+       "value": null,
+       "evidence": null
+      },
+      "form_link": {
+       "value": null,
+       "evidence": null
+      },
+      "batches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-022",
+   "subject": "Crestline shortlist - Round 2",
+   "received_at": "2026-10-08T18:00",
+   "text": "The following students are shortlisted for Round 2 (technical interview) of Crestline Motors.\nInterviews will be held on 11 Oct from 10 AM in Block C. Carry your ID cards.",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": false,
+      "company": {
+       "value": "Crestline Motors",
+       "evidence": "The following students are shortlisted for Round 2 (technical interview) of Crestline Motors."
+      },
+      "role": {
+       "value": null,
+       "evidence": null
+      },
+      "deadline": {
+       "value": null,
+       "evidence": null
+      },
+      "form_link": {
+       "value": null,
+       "evidence": null
+      },
+      "batches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-023",
+   "subject": "Openings this week (2027 & 2028)",
+   "received_at": "2026-10-07T09:00",
+   "text": "Openings this week, for batch 2027 and 2028:\n\n1) Ridgeway Labs - Frontend Intern\nCGPA 8.5 and above.\nApply by 15 Oct 2026, 5 PM: https://forms.gle/synthRidge023\n\n2) Meadow AI - ML Intern\nCGPA 8.0 and above. CSE and AIML only.\nApply by 17 Oct 2026, 5 PM: https://forms.gle/synthMeadow023",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Ridgeway Labs",
+       "evidence": "1) Ridgeway Labs - Frontend Intern"
+      },
+      "role": {
+       "value": "Frontend Intern",
+       "evidence": "1) Ridgeway Labs - Frontend Intern"
+      },
+      "deadline": {
+       "value": "2026-10-15T17:00:00",
+       "evidence": "Apply by 15 Oct 2026, 5 PM: https://forms.gle/synthRidge023"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthRidge023",
+       "evidence": "Apply by 15 Oct 2026, 5 PM: https://forms.gle/synthRidge023"
+      },
+      "batches": {
+       "value": [
+        2027,
+        2028
+       ],
+       "evidence": "Openings this week, for batch 2027 and 2028:"
+      },
+      "min_cgpa": {
+       "value": 8.5,
+       "evidence": "CGPA 8.5 and above."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    },
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Meadow AI",
+       "evidence": "2) Meadow AI - ML Intern"
+      },
+      "role": {
+       "value": "ML Intern",
+       "evidence": "2) Meadow AI - ML Intern"
+      },
+      "deadline": {
+       "value": "2026-10-17T17:00:00",
+       "evidence": "Apply by 17 Oct 2026, 5 PM: https://forms.gle/synthMeadow023"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthMeadow023",
+       "evidence": "Apply by 17 Oct 2026, 5 PM: https://forms.gle/synthMeadow023"
+      },
+      "batches": {
+       "value": [
+        2027,
+        2028
+       ],
+       "evidence": "Openings this week, for batch 2027 and 2028:"
+      },
+      "min_cgpa": {
+       "value": 8.0,
+       "evidence": "CGPA 8.0 and above."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "CSE",
+        "AIML"
+       ],
+       "evidence": "CSE and AIML only."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-024",
+   "subject": "Tidewater Tech - multiple batches",
+   "received_at": "2026-10-06T11:00",
+   "text": "Tidewater Tech is hiring Software Engineers from the 2025-2027 passout batches.\nApply by 22 Oct 2026: https://forms.gle/synthTide024",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Tidewater Tech",
+       "evidence": "Tidewater Tech is hiring Software Engineers from the 2025-2027 passout batches."
+      },
+      "role": {
+       "value": "Software Engineer",
+       "evidence": "Tidewater Tech is hiring Software Engineers from the 2025-2027 passout batches."
+      },
+      "deadline": {
+       "value": "2026-10-22T23:59:00",
+       "evidence": "Apply by 22 Oct 2026: https://forms.gle/synthTide024"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthTide024",
+       "evidence": "Apply by 22 Oct 2026: https://forms.gle/synthTide024"
+      },
+      "batches": {
+       "value": [
+        2025,
+        2026,
+        2027
+       ],
+       "evidence": "Tidewater Tech is hiring Software Engineers from the 2025-2027 passout batches."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-025",
+   "subject": "Copperleaf internship",
+   "received_at": "2026-10-06T15:00",
+   "text": "Copperleaf Media is looking for Content Engineering interns.\nOpen to '27 and '28 grads.\nFill the form by 19 Oct 2026: https://forms.gle/synthCopper025",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Copperleaf Media",
+       "evidence": "Copperleaf Media is looking for Content Engineering interns."
+      },
+      "role": {
+       "value": "Content Engineering intern",
+       "evidence": "Copperleaf Media is looking for Content Engineering interns."
+      },
+      "deadline": {
+       "value": "2026-10-19T23:59:00",
+       "evidence": "Fill the form by 19 Oct 2026: https://forms.gle/synthCopper025"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthCopper025",
+       "evidence": "Fill the form by 19 Oct 2026: https://forms.gle/synthCopper025"
+      },
+      "batches": {
+       "value": [
+        2027,
+        2028
+       ],
+       "evidence": "Open to '27 and '28 grads."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-026",
+   "subject": "Ironbark Infra",
+   "received_at": "2026-10-07T10:00",
+   "text": "Ironbark Infra - Software Trainee\nEligible branches: all branches except Civil and Mechanical.\nBatch 2027. Apply by 20 Oct 2026: https://forms.gle/synthIronbark026",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Ironbark Infra",
+       "evidence": "Ironbark Infra - Software Trainee"
+      },
+      "role": {
+       "value": "Software Trainee",
+       "evidence": "Ironbark Infra - Software Trainee"
+      },
+      "deadline": {
+       "value": "2026-10-20T23:59:00",
+       "evidence": "Apply by 20 Oct 2026: https://forms.gle/synthIronbark026"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthIronbark026",
+       "evidence": "Apply by 20 Oct 2026: https://forms.gle/synthIronbark026"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Batch 2027. Apply by 20 Oct 2026: https://forms.gle/synthIronbark026"
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "all branches except Civil and Mechanical"
+       ],
+       "evidence": "Eligible branches: all branches except Civil and Mechanical."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-027",
+   "subject": "Zephyr Games",
+   "received_at": "2026-10-08T11:00",
+   "text": "Zephyr Games - Game Developer Intern (2027 batch)\nMinimum CGPA 8.5 (relaxable for exceptional candidates).\nApply by 18 Oct 2026: https://forms.gle/synthZephyr027",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Zephyr Games",
+       "evidence": "Zephyr Games - Game Developer Intern (2027 batch)"
+      },
+      "role": {
+       "value": "Game Developer Intern",
+       "evidence": "Zephyr Games - Game Developer Intern (2027 batch)"
+      },
+      "deadline": {
+       "value": "2026-10-18T23:59:00",
+       "evidence": "Apply by 18 Oct 2026: https://forms.gle/synthZephyr027"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthZephyr027",
+       "evidence": "Apply by 18 Oct 2026: https://forms.gle/synthZephyr027"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Zephyr Games - Game Developer Intern (2027 batch)"
+      },
+      "min_cgpa": {
+       "value": 8.5,
+       "evidence": "Minimum CGPA 8.5 (relaxable for exceptional candidates)."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "CGPA requirement is relaxable for exceptional candidates",
+        "evidence": "Minimum CGPA 8.5 (relaxable for exceptional candidates)."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-028",
+   "subject": "Fwd: Maple Robotics drive",
+   "received_at": "2026-10-06T12:00",
+   "text": "---------- Forwarded message ---------\nFrom: Placement Office\nDate: Mon, 5 Oct 2026\nSubject: Maple Robotics drive\n\nMaple Robotics - Automation Engineer (Full Time)\nBatch: 2027. Minimum CGPA: 6.0.\nRegister by 16 Oct 2026, 4 PM: https://forms.gle/synthMaple028",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Maple Robotics",
+       "evidence": "Maple Robotics - Automation Engineer (Full Time)"
+      },
+      "role": {
+       "value": "Automation Engineer",
+       "evidence": "Maple Robotics - Automation Engineer (Full Time)"
+      },
+      "deadline": {
+       "value": "2026-10-16T16:00:00",
+       "evidence": "Register by 16 Oct 2026, 4 PM: https://forms.gle/synthMaple028"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthMaple028",
+       "evidence": "Register by 16 Oct 2026, 4 PM: https://forms.gle/synthMaple028"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Batch: 2027. Minimum CGPA: 6.0."
+      },
+      "min_cgpa": {
+       "value": 6.0,
+       "evidence": "Batch: 2027. Minimum CGPA: 6.0."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-029",
+   "subject": "Sable Security internship",
+   "received_at": "2026-10-07T09:30",
+   "text": "Sable Security - Security Analyst Intern\nBatch 2027, CSE/IT only.\nSubmit applications by Oct 14th, 2026 by 23:59 hrs: https://forms.gle/synthSable029",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Sable Security",
+       "evidence": "Sable Security - Security Analyst Intern"
+      },
+      "role": {
+       "value": "Security Analyst Intern",
+       "evidence": "Sable Security - Security Analyst Intern"
+      },
+      "deadline": {
+       "value": "2026-10-14T23:59:00",
+       "evidence": "Submit applications by Oct 14th, 2026 by 23:59 hrs: https://forms.gle/synthSable029"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthSable029",
+       "evidence": "Submit applications by Oct 14th, 2026 by 23:59 hrs: https://forms.gle/synthSable029"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Batch 2027, CSE/IT only."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": [
+        "CSE",
+        "IT"
+       ],
+       "evidence": "Batch 2027, CSE/IT only."
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-030",
+   "subject": "Wren Health",
+   "received_at": "2026-10-07T08:00",
+   "text": "Wren Health is hiring Backend Interns from the 2027 batch.\nRegister by this Friday, 5 PM: https://forms.gle/synthWren030",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Wren Health",
+       "evidence": "Wren Health is hiring Backend Interns from the 2027 batch."
+      },
+      "role": {
+       "value": "Backend Interns",
+       "evidence": "Wren Health is hiring Backend Interns from the 2027 batch."
+      },
+      "deadline": {
+       "value": null,
+       "evidence": null
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthWren030",
+       "evidence": "Register by this Friday, 5 PM: https://forms.gle/synthWren030"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Wren Health is hiring Backend Interns from the 2027 batch."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-031",
+   "subject": "Juniper Data - JD and form",
+   "received_at": "2026-10-07T12:30",
+   "text": "Juniper Data - Data Analyst (2027 batch, CGPA 7+)\nJob description: https://drive.google.com/synthJD031\nRegister here: https://forms.gle/synthJuniper031\nLast date: 17 Oct 2026",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Juniper Data",
+       "evidence": "Juniper Data - Data Analyst (2027 batch, CGPA 7+)"
+      },
+      "role": {
+       "value": "Data Analyst",
+       "evidence": "Juniper Data - Data Analyst (2027 batch, CGPA 7+)"
+      },
+      "deadline": {
+       "value": "2026-10-17T23:59:00",
+       "evidence": "Last date: 17 Oct 2026"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthJuniper031",
+       "evidence": "Register here: https://forms.gle/synthJuniper031"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Juniper Data - Data Analyst (2027 batch, CGPA 7+)"
+      },
+      "min_cgpa": {
+       "value": 7.0,
+       "evidence": "Juniper Data - Data Analyst (2027 batch, CGPA 7+)"
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-032",
+   "subject": "Pool drive - Vector Retail",
+   "received_at": "2026-10-06T16:30",
+   "text": "Vector Retail pool campus drive - Graduate Trainee\nOnly for students from Delhi NCR campuses, 2027 batch.\nApply by 21 Oct 2026: https://forms.gle/synthVector032",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Vector Retail",
+       "evidence": "Vector Retail pool campus drive - Graduate Trainee"
+      },
+      "role": {
+       "value": "Graduate Trainee",
+       "evidence": "Vector Retail pool campus drive - Graduate Trainee"
+      },
+      "deadline": {
+       "value": "2026-10-21T23:59:00",
+       "evidence": "Apply by 21 Oct 2026: https://forms.gle/synthVector032"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthVector032",
+       "evidence": "Apply by 21 Oct 2026: https://forms.gle/synthVector032"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Only for students from Delhi NCR campuses, 2027 batch."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": [
+       {
+        "value": "Only for students from Delhi NCR campuses",
+        "evidence": "Only for students from Delhi NCR campuses, 2027 batch."
+       }
+      ]
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-033",
+   "subject": "Summit Labs - 2028 interns",
+   "received_at": "2026-10-08T13:00",
+   "text": "Summit Labs - Summer Research Intern\nOnly 2028 batch students may apply.\nApply by 25 Oct 2026: https://forms.gle/synthSummit033",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Summit Labs",
+       "evidence": "Summit Labs - Summer Research Intern"
+      },
+      "role": {
+       "value": "Summer Research Intern",
+       "evidence": "Summit Labs - Summer Research Intern"
+      },
+      "deadline": {
+       "value": "2026-10-25T23:59:00",
+       "evidence": "Apply by 25 Oct 2026: https://forms.gle/synthSummit033"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthSummit033",
+       "evidence": "Apply by 25 Oct 2026: https://forms.gle/synthSummit033"
+      },
+      "batches": {
+       "value": [
+        2028
+       ],
+       "evidence": "Only 2028 batch students may apply."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-034",
+   "subject": "Polaris (US) internship",
+   "received_at": "2026-10-07T15:00",
+   "text": "Polaris Systems (US office) - Software Intern, 2027 batch.\nMinimum GPA 3.2 on a 4.0 scale.\nApply by 23 Oct 2026: https://forms.gle/synthPolaris034",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Polaris Systems",
+       "evidence": "Polaris Systems (US office) - Software Intern, 2027 batch."
+      },
+      "role": {
+       "value": "Software Intern",
+       "evidence": "Polaris Systems (US office) - Software Intern, 2027 batch."
+      },
+      "deadline": {
+       "value": "2026-10-23T23:59:00",
+       "evidence": "Apply by 23 Oct 2026: https://forms.gle/synthPolaris034"
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthPolaris034",
+       "evidence": "Apply by 23 Oct 2026: https://forms.gle/synthPolaris034"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Polaris Systems (US office) - Software Intern, 2027 batch."
+      },
+      "min_cgpa": {
+       "value": 3.2,
+       "evidence": "Minimum GPA 3.2 on a 4.0 scale."
+      },
+      "cgpa_scale": 4.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-035",
+   "subject": "Larkspur - registrations open",
+   "received_at": "2026-10-08T10:00",
+   "text": "Larkspur Fintech registrations are open now!\nRole: Product Engineer Intern. 2027 batch, CGPA 7 and above.\nRegister: https://forms.gle/synthLarkspur035",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Larkspur Fintech",
+       "evidence": "Larkspur Fintech registrations are open now!"
+      },
+      "role": {
+       "value": "Product Engineer Intern",
+       "evidence": "Role: Product Engineer Intern."
+      },
+      "deadline": {
+       "value": null,
+       "evidence": null
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthLarkspur035",
+       "evidence": "Register: https://forms.gle/synthLarkspur035"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "2027 batch, CGPA 7 and above."
+      },
+      "min_cgpa": {
+       "value": 7.0,
+       "evidence": "2027 batch, CGPA 7 and above."
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  },
+  {
+   "id": "syn-036",
+   "subject": "(delayed) Onyx Mobility drive",
+   "received_at": "2026-10-12T09:00",
+   "text": "Onyx Mobility - Embedded Engineer, 2027 batch.\nLast date to register: 10 Oct 2026, 5 PM.\nLink: https://forms.gle/synthOnyx036",
+   "opportunities": [
+    {
+     "extraction": {
+      "is_opportunity": true,
+      "company": {
+       "value": "Onyx Mobility",
+       "evidence": "Onyx Mobility - Embedded Engineer, 2027 batch."
+      },
+      "role": {
+       "value": "Embedded Engineer",
+       "evidence": "Onyx Mobility - Embedded Engineer, 2027 batch."
+      },
+      "deadline": {
+       "value": null,
+       "evidence": "Last date to register: 10 Oct 2026, 5 PM."
+      },
+      "form_link": {
+       "value": "https://forms.gle/synthOnyx036",
+       "evidence": "Link: https://forms.gle/synthOnyx036"
+      },
+      "batches": {
+       "value": [
+        2027
+       ],
+       "evidence": "Onyx Mobility - Embedded Engineer, 2027 batch."
+      },
+      "min_cgpa": {
+       "value": null,
+       "evidence": null
+      },
+      "cgpa_scale": 10.0,
+      "branches": {
+       "value": null,
+       "evidence": null
+      },
+      "min_10th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "min_12th_percent": {
+       "value": null,
+       "evidence": null
+      },
+      "max_active_backlogs": {
+       "value": null,
+       "evidence": null
+      },
+      "required_skills": {
+       "value": null,
+       "evidence": null
+      },
+      "other_criteria": []
+     },
+     "issues": []
+    }
+   ]
+  }
+ ]
+}

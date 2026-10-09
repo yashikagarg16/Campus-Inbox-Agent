@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, type IngestResult } from "../api";
+import { useServerConfig } from "../App";
 import { Button, Card, ErrorBox, Field, inputClass, Notice, VerdictBadge } from "../components/ui";
 
 type Mode = "paste" | "upload";
@@ -42,11 +43,19 @@ export function AddEmailPage() {
     }
   }
 
-  const canSubmit = mode === "paste" ? text.trim().length >= 20 : file !== null;
+  const { config } = useServerConfig();
+  const demo = config?.demo_mode ?? false;
+  const canSubmit = !demo && (mode === "paste" ? text.trim().length >= 20 : file !== null);
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <h1 className="text-xl font-semibold">Add an email</h1>
+      {demo && (
+        <Notice tone="warn">
+          Adding emails is turned off in this public demo, so it can't use up the Gemini quota or store other people's
+          email. Run the app locally (see the README) to try your own.
+        </Notice>
+      )}
       <Notice>
         Remove anything you don't want stored (phone numbers, other students' names) before pasting. The text
         is sent to the LLM for extraction.

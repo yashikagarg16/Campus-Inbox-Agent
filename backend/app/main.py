@@ -6,12 +6,14 @@ Run with:  uvicorn app.main:create_app --factory
 from __future__ import annotations
 
 import imaplib
+import json
 import secrets
 from datetime import datetime, timedelta
 from typing import Any, Callable, Iterator
 
 from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -21,11 +23,12 @@ from . import service
 from .config import Settings
 from .extractor import ExtractionFailed, LLMClient
 from .graph_mail import GraphAuthRequired, GraphMail, get_token
-from .models import AuditEvent, DraftRow, EmailRow, OpportunityRow, make_sessionmaker
+from .models import BACKEND_DIR, AuditEvent, DraftRow, EmailRow, OpportunityRow, make_sessionmaker
 from .parsing import parse_eml
 from .schemas import Decision, DraftStatus, FieldIssue, Profile, local_now, to_local_naive
 
 MAX_EML_BYTES = 2_000_000
+DEMO_SEED = BACKEND_DIR / "demo_data" / "seed.json"
 
 
 # --- request / response shapes ------------------------------------------------------------------
@@ -115,6 +118,7 @@ class SyncOut(BaseModel):
 
 
 class ConfigOut(BaseModel):
+    demo_mode: bool = False
     llm_configured: bool
     imap_configured: bool  # any inbox sync (IMAP or Outlook) is set up
     mail_source: str | None = None  # "graph" | "imap" | None
@@ -160,6 +164,17 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
         return settings.gemini_client()
 
     app.state.llm_factory = llm_factory or default_llm
+    if settings.demo_mode:
+        with app.state.sessionmaker() as session:
+            service.seed_demo(session, json.loads(DEMO_SEED.read_text(encoding="utf-8")))
+
+        @app.middleware("http")
+        async def read_only(request: Request, call_next):
+            if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+                return JSONResponse({"detail": "This is a read-only demo with synthetic emails. "
+                                               "Run the app locally to add your own."}, status_code=403)
+            return await call_next(request)
+
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"],
                        allow_headers=["*"])
 
@@ -210,7 +225,7 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
 
     @api.get("/config", response_model=ConfigOut)
     def read_config() -> ConfigOut:
-        return ConfigOut(llm_configured=bool(settings.gemini_api_key) or llm_factory is not None,
+        return ConfigOut(demo_mode=settings.demo_mode, llm_configured=bool(settings.gemini_api_key) or llm_factory is not None,
                          imap_configured=settings.mail_source is not None, mail_source=settings.mail_source,
                          auth_required=settings.app_token is not None)
 

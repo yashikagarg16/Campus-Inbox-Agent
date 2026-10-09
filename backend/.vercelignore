@@ -1,0 +1,11 @@
+# Never upload secrets, local data or dev-only files.
+.env
+.env.*
+.venv/
+.graph_token_cache.json
+*.db
+__pycache__/
+.pytest_cache/
+tests/
+tools/
+eval/

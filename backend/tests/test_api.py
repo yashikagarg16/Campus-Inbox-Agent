@@ -277,3 +277,19 @@ def test_full_flow_on_postgres(llm):
     assert c.post(f"/opportunities/{opp['id']}/drafts", json={"questions": ["q"]}).status_code == 201
     assert c.delete(f"/emails/{opp['email_id']}").status_code == 204
     assert c.get("/opportunities").json() == []
+
+
+def test_demo_mode_is_seeded_and_read_only():
+    c = TestClient(create_app(Settings(database_url="sqlite://", demo_mode=True)))
+    assert c.get("/config").json()["demo_mode"] is True
+    opps = c.get("/opportunities").json()
+    assert len(opps) == 38
+    verdicts = {o["verdict"] for o in opps}
+    assert {"eligible", "not_eligible", "needs_review"} <= verdicts
+    detail = c.get(f"/opportunities/{opps[0]['id']}").json()
+    assert any(r["span"] for r in detail["decision"]["rules"]) or not detail["decision"]["rules"]
+    for method, path, body in [("post", "/emails", {"text": SAMPLE_EMAIL}), ("put", "/profile", PROFILE),
+                               ("delete", f"/emails/{opps[0]['email_id']}", None), ("post", "/sync/inbox", {})]:
+        r = getattr(c, method)(path, json=body) if body is not None else getattr(c, method)(path)
+        assert r.status_code == 403, (method, path)
+    assert c.get("/profile").json()["name"] == "Demo Student"

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api, type Profile } from "../api";
+import { useServerConfig } from "../App";
 import { Button, Card, ErrorBox, Field, inputClass, Notice } from "../components/ui";
 import { splitList } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
@@ -57,6 +58,7 @@ export function ProfilePage() {
   const { data, error } = useAsync(() => api.getProfile(), []);
   const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
+  const demo = useServerConfig().config?.demo_mode ?? false;
   const [saveError, setSaveError] = useState<unknown>(null);
   const [saved, setSaved] = useState<string | null>(null);
 
@@ -131,7 +133,8 @@ export function ProfilePage() {
           <Field label="About you" hint="Projects, internships, interests. Drafted answers use only what's written here.">
             <textarea className={`${inputClass} min-h-32`} value={form.resume_summary} onChange={set("resume_summary")} />
           </Field>
-          <Button type="submit" disabled={saving}>
+          {demo && <p className="text-sm text-slate-500">This is the demo profile; saving is turned off in the public demo.</p>}
+          <Button type="submit" disabled={saving || demo}>
             {saving ? "Saving…" : "Save profile"}
           </Button>
         </form>
