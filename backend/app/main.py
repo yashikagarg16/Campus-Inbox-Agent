@@ -20,6 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from . import service
+from .auth import TOKEN_TTL_SECONDS, LoginThrottle, make_token, read_token, verify_password
 from .config import Settings
 from .extractor import ExtractionFailed, LLMClient
 from .graph_mail import GraphAuthRequired, GraphMail, get_token
@@ -117,8 +118,41 @@ class SyncOut(BaseModel):
     email_ids: list[int]
 
 
+class LoginIn(BaseModel):
+    email: str = Field(max_length=320)
+    password: str = Field(max_length=200)
+
+
+class LoginOut(BaseModel):
+    token: str
+    email: str
+    expires_in: int
+
+
+class MeOut(BaseModel):
+    email: str
+
+
+class PreviewOpportunity(BaseModel):
+    company: str | None
+    role: str | None
+    deadline: datetime | None
+    form_link: str | None
+    verdict: str
+    is_opportunity: bool
+    extraction: dict[str, Any]
+    issues: list[FieldIssue]
+    decision: Decision
+
+
+class PreviewOut(BaseModel):
+    email_text: str
+    opportunities: list[PreviewOpportunity]
+
+
 class ConfigOut(BaseModel):
     demo_mode: bool = False
+    owner_login: bool = False
     llm_configured: bool
     imap_configured: bool  # any inbox sync (IMAP or Outlook) is set up
     mail_source: str | None = None  # "graph" | "imap" | None
@@ -170,21 +204,44 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
 
         @app.middleware("http")
         async def read_only(request: Request, call_next):
-            if request.method in ("POST", "PUT", "PATCH", "DELETE"):
-                return JSONResponse({"detail": "This is a read-only demo with synthetic emails. "
-                                               "Run the app locally to add your own."}, status_code=403)
+            # Visitors can only read. Signing in is allowed, and the owner may run live previews.
+            if request.method in ("POST", "PUT", "PATCH", "DELETE") and request.url.path != "/auth/login":
+                header = request.headers.get("authorization", "")
+                token = header[7:] if header.lower().startswith("bearer ") else ""
+                if not (request.url.path == "/preview" and identify(token)):
+                    return JSONResponse({"detail": "This is a read-only demo with synthetic emails. "
+                                                   "Sign in to run a live check, or run the app locally to "
+                                                   "add your own."}, status_code=403)
             return await call_next(request)
 
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"],
                        allow_headers=["*"])
 
     bearer = HTTPBearer(auto_error=False)
+    throttle = LoginThrottle()
 
-    def require_token(creds: HTTPAuthorizationCredentials | None = Depends(bearer)) -> None:
-        if settings.app_token is None:
-            return
-        if creds is None or not secrets.compare_digest(creds.credentials.encode(), settings.app_token.encode()):
-            raise HTTPException(401, "Missing or wrong access token.", headers={"WWW-Authenticate": "Bearer"})
+    def identify(token: str | None) -> str | None:
+        """Who a bearer token belongs to: the owner's email, "app-token", or None."""
+        if not token:
+            return None
+        if settings.app_token and secrets.compare_digest(token.encode(), settings.app_token.encode()):
+            return "app-token"
+        if settings.owner_login:
+            return read_token(token, settings.session_secret)
+        return None
+
+    def require_token(request: Request, creds: HTTPAuthorizationCredentials | None = Depends(bearer)) -> None:
+        user = identify(creds.credentials if creds else None)
+        if settings.demo_mode and request.method == "GET":
+            return  # the public demo is readable by anyone
+        if settings.auth_required and user is None:
+            raise HTTPException(401, "Please sign in.", headers={"WWW-Authenticate": "Bearer"})
+
+    def require_user(creds: HTTPAuthorizationCredentials | None = Depends(bearer)) -> str:
+        user = identify(creds.credentials if creds else None)
+        if user is None:
+            raise HTTPException(401, "Please sign in.", headers={"WWW-Authenticate": "Bearer"})
+        return user
 
     def get_session(request: Request) -> Iterator[Session]:
         with request.app.state.sessionmaker() as session:
@@ -221,13 +278,48 @@ def create_app(settings: Settings | None = None, llm_factory: Callable[[], LLMCl
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    api = APIRouter(dependencies=[Depends(require_token)])
-
-    @api.get("/config", response_model=ConfigOut)
+    @app.get("/config", response_model=ConfigOut)
     def read_config() -> ConfigOut:
-        return ConfigOut(demo_mode=settings.demo_mode, llm_configured=bool(settings.gemini_api_key) or llm_factory is not None,
+        return ConfigOut(demo_mode=settings.demo_mode, owner_login=settings.owner_login, llm_configured=bool(settings.gemini_api_key) or llm_factory is not None,
                          imap_configured=settings.mail_source is not None, mail_source=settings.mail_source,
-                         auth_required=settings.app_token is not None)
+                         auth_required=settings.auth_required)
+
+    @app.post("/auth/login", response_model=LoginOut)
+    def login(body: LoginIn, request: Request) -> LoginOut:
+        if not settings.owner_login:
+            raise HTTPException(404, "Sign-in isn't set up on this server.")
+        forwarded = request.headers.get("x-forwarded-for") or (request.client.host if request.client else "")
+        ip = forwarded.split(",")[0].strip()
+        if throttle.blocked(ip):
+            raise HTTPException(429, "Too many attempts. Try again in a few minutes.")
+        email_ok = secrets.compare_digest(body.email.strip().lower().encode(), settings.admin_email.encode())
+        if not (verify_password(body.password, settings.admin_password_hash) and email_ok):
+            throttle.fail(ip)
+            raise HTTPException(401, "Wrong email or password.")
+        throttle.reset(ip)
+        return LoginOut(token=make_token(settings.admin_email, settings.session_secret),
+                        email=settings.admin_email, expires_in=TOKEN_TTL_SECONDS)
+
+    @app.get("/auth/me", response_model=MeOut)
+    def me(user: str = Depends(require_user)) -> MeOut:
+        return MeOut(email=user)
+
+    @app.post("/preview", response_model=PreviewOut)
+    def preview(body: EmailIn, user: str = Depends(require_user), session: Session = Depends(get_session),
+                llm: LLMClient = Depends(get_llm)) -> PreviewOut:
+        """Run the full pipeline on one email and return the result without storing anything."""
+        received = to_local_naive(body.received_at) if body.received_at else local_now()
+        cleaned, items = call_llm(session, service.preview_email, llm, body.text, received,
+                                  service.get_profile(session))
+        return PreviewOut(email_text=cleaned, opportunities=[
+            PreviewOpportunity(company=o.extraction.company.value, role=o.extraction.role.value,
+                               deadline=o.extraction.deadline.value, form_link=o.extraction.form_link.value,
+                               verdict=d.verdict.value, is_opportunity=o.extraction.is_opportunity,
+                               extraction=o.extraction.model_dump(mode="json"), issues=o.issues, decision=d)
+            for o, d in items
+        ])
+
+    api = APIRouter(dependencies=[Depends(require_token)])
 
     @api.get("/profile", response_model=Profile)
     def read_profile(session: Session = Depends(get_session)) -> Profile:

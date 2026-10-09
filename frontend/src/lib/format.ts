@@ -33,7 +33,7 @@ export function relativeDeadline(value: string | null, now: Date = new Date()): 
   const abs = Math.abs(ms);
   const hours = Math.round(abs / 3_600_000);
   const days = Math.round(abs / 86_400_000);
-  const amount = hours < 36 ? (hours < 1 ? "under an hour" : `${hours} hour${hours === 1 ? "" : "s"}`) : `${days} days`;
+  const amount = hours < 36 ? (hours < 1 ? "under an hour" : `${hours} hour${hours === 1 ? "" : "s"}`) : `${days} day${days === 1 ? "" : "s"}`;
   return ms >= 0 ? `in ${amount}` : `${amount} ago`;
 }
 

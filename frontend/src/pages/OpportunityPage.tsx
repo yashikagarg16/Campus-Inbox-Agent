@@ -40,7 +40,7 @@ export function OpportunityPage() {
     if (!window.confirm(`Delete this email${others}? This removes it and its audit log from the database.`)) return;
     try {
       await api.deleteEmail(opp.email_id);
-      navigate("/");
+      navigate("/app");
     } catch (e) {
       setDeleteError(e);
     }
@@ -55,7 +55,7 @@ export function OpportunityPage() {
 
   return (
     <div className="space-y-4">
-      <Link to="/" className="text-sm text-indigo-600 hover:underline">
+      <Link to="/app" className="text-sm text-indigo-600 hover:underline">
         ← All opportunities
       </Link>
 
@@ -104,7 +104,7 @@ export function OpportunityPage() {
             {opp.siblings.map((s, i) => (
               <span key={s}>
                 {i > 0 && ", "}
-                <Link className="text-indigo-600 underline" to={`/opportunities/${s}`}>
+                <Link className="text-indigo-600 underline" to={`/app/opportunities/${s}`}>
                   opportunity #{s}
                 </Link>
               </span>

@@ -67,8 +67,8 @@ export function DashboardPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Opportunities</h1>
-          <p className="text-sm text-slate-500">Sorted by deadline. Click one to see the evidence.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Opportunities</h1>
+          <p className="mt-1 text-sm text-slate-500">Sorted by deadline. Open one to see the sentence behind each rule.</p>
         </div>
         <div className="flex gap-2">
           {config?.imap_configured && (
@@ -76,8 +76,8 @@ export function DashboardPage() {
               {syncing ? "Checking inbox…" : "Check inbox (last 7 days)"}
             </Button>
           )}
-          <Link to="/add" className={buttonClass()}>
-            Add email
+          <Link to="/app/add" className={buttonClass()}>
+            Check an email
           </Link>
         </div>
       </div>
@@ -85,10 +85,11 @@ export function DashboardPage() {
       {configError ? (
         <ErrorBox error={configError} />
       ) : (
-        config && !config.llm_configured && (
+        config && !config.llm_configured && !config.demo_mode && (
           <Notice tone="warn">The server has no GEMINI_API_KEY, so new emails can't be processed yet.</Notice>
         )
       )}
+      {data && data.length > 0 && <StatTiles items={data} />}
       {syncMessage && <Notice tone="ok">{syncMessage}</Notice>}
       <ErrorBox error={syncError} />
 
@@ -121,8 +122,8 @@ export function DashboardPage() {
           <p className="text-sm text-slate-600 dark:text-slate-400">
             {data.length === 0 ? (
               <>
-                Nothing here yet. <Link className="text-indigo-600 underline" to="/add">Paste a placement email</Link>{" "}
-                to get started, and fill in your <Link className="text-indigo-600 underline" to="/profile">profile</Link>{" "}
+                Nothing here yet. <Link className="text-indigo-600 underline" to="/app/add">Paste a placement email</Link>{" "}
+                to get started, and fill in your <Link className="text-indigo-600 underline" to="/app/profile">profile</Link>{" "}
                 so eligibility can be checked.
               </>
             ) : (
@@ -139,7 +140,7 @@ export function DashboardPage() {
             return (
               <li key={o.id}>
                 <Link
-                  to={`/opportunities/${o.id}`}
+                  to={`/app/opportunities/${o.id}`}
                   className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/60"
                 >
                   <div className="min-w-0 flex-1">
@@ -166,6 +167,30 @@ export function DashboardPage() {
           })}
         </ul>
       )}
+    </div>
+  );
+}
+
+function StatTiles({ items }: { items: OpportunitySummary[] }) {
+  const count = (v: Verdict) => items.filter((o) => o.verdict === v).length;
+  const dueSoon = items.filter((o) => ["urgent", "soon"].includes(deadlineUrgency(o.deadline))).length;
+  const tiles = [
+    { label: "Eligible", value: count("eligible"), accent: "bg-emerald-500" },
+    { label: "Needs review", value: count("needs_review"), accent: "bg-amber-500" },
+    { label: "Not eligible", value: count("not_eligible"), accent: "bg-rose-500" },
+    { label: "Due in 7 days", value: dueSoon, accent: "bg-indigo-500" },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {tiles.map((t) => (
+        <div key={t.label} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+            <span className={`size-2 rounded-full ${t.accent}`} />
+            {t.label}
+          </div>
+          <p className="mt-2 text-3xl font-semibold tracking-tight tabular-nums">{t.value}</p>
+        </div>
+      ))}
     </div>
   );
 }

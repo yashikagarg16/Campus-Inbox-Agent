@@ -95,6 +95,7 @@ export interface AuditEvent {
 
 export interface ServerConfig {
   demo_mode?: boolean;
+  owner_login?: boolean;
   llm_configured: boolean;
   imap_configured: boolean; // any inbox sync is set up
   mail_source?: "graph" | "imap" | null;
@@ -136,6 +137,27 @@ export function getApiUrl(): string {
 
 export function getToken(): string {
   return readStorage(TOKEN_KEY) ?? "";
+}
+
+export function setToken(token: string): void {
+  writeStorage(TOKEN_KEY, token);
+}
+
+export interface PreviewOpportunity {
+  company: string | null;
+  role: string | null;
+  deadline: string | null;
+  form_link: string | null;
+  verdict: Verdict;
+  is_opportunity: boolean;
+  extraction: Record<string, unknown>;
+  issues: FieldIssue[];
+  decision: Decision;
+}
+
+export interface PreviewResult {
+  email_text: string;
+  opportunities: PreviewOpportunity[];
 }
 
 export function saveConnection(apiUrl: string, token: string): void {
@@ -183,6 +205,14 @@ const json = (body: unknown) => JSON.stringify(body);
 
 export const api = {
   config: () => request<ServerConfig>("/config"),
+  login: (email: string, password: string) =>
+    request<{ token: string; email: string; expires_in: number }>("/auth/login", {
+      method: "POST",
+      body: json({ email, password }),
+    }),
+  me: () => request<{ email: string }>("/auth/me"),
+  preview: (body: { text: string; received_at?: string }) =>
+    request<PreviewResult>("/preview", { method: "POST", body: json(body) }),
   getProfile: () => request<Profile>("/profile"),
   saveProfile: (p: Profile) =>
     request<{ profile: Profile; reevaluated: number }>("/profile", { method: "PUT", body: json(p) }),

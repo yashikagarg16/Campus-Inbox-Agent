@@ -40,6 +40,18 @@ class Settings:
     ms_tenant: str = "organizations"
     # Public read-only demo: seeds synthetic emails on startup and rejects every write.
     demo_mode: bool = False
+    # Owner sign-in (one account). Hash from `python -m tools.hash_password`.
+    admin_email: str | None = None
+    admin_password_hash: str | None = None
+    session_secret: str | None = None  # signs session tokens; required with admin login
+
+    @property
+    def owner_login(self) -> bool:
+        return bool(self.admin_email and self.admin_password_hash and self.session_secret)
+
+    @property
+    def auth_required(self) -> bool:
+        return bool(self.app_token or self.owner_login)
 
     def gemini_client(self):
         from .extractor import GeminiClient
@@ -79,4 +91,7 @@ class Settings:
             ms_client_id=env("MS_CLIENT_ID") or None,
             ms_tenant=env("MS_TENANT") or cls.ms_tenant,
             demo_mode=env("DEMO_MODE", "false").lower() == "true",
+            admin_email=(env("ADMIN_EMAIL") or "").strip().lower() or None,
+            admin_password_hash=env("ADMIN_PASSWORD_HASH") or None,
+            session_secret=env("SESSION_SECRET") or None,
         )

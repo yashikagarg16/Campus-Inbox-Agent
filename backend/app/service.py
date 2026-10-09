@@ -197,6 +197,15 @@ def sync_imap(session: Session, client: LLMClient, settings, since: date, limit:
     return sync_messages(session, client, messages, since, "imap")
 
 
+# --- live preview (nothing stored) -----------------------------------------------------------
+
+def preview_email(client: LLMClient, text: str, received_at: datetime | None,
+                  profile: Profile) -> tuple[str, list[tuple[OpportunityOutcome, Decision]]]:
+    cleaned = clean_text(text)
+    outcome = extract(client, cleaned, received_at)
+    return cleaned, [(o, rules.evaluate(o.extraction, profile, o.issues, o.spans)) for o in outcome.opportunities]
+
+
 # --- demo seed --------------------------------------------------------------------------------
 
 def seed_demo(session: Session, seed: dict) -> int:

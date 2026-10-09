@@ -77,7 +77,7 @@ describe("dashboard", () => {
       "GET /opportunities": [summary({ company: "Acme Analytics" }), summary({ id: 2, company: "Quantly", verdict: "needs_review" })],
     });
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={["/app"]}>
         <App />
       </MemoryRouter>,
     );
@@ -90,7 +90,7 @@ describe("dashboard", () => {
   it("shows a clear error when the server is down", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => Promise.reject(new TypeError("Failed to fetch"))));
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={["/app"]}>
         <App />
       </MemoryRouter>,
     );
@@ -102,7 +102,7 @@ describe("opportunity page", () => {
   it("shows rules, highlights evidence and lists unverified fields", async () => {
     mockFetch({ "GET /config": CONFIG, "GET /opportunities/1": detail });
     render(
-      <MemoryRouter initialEntries={["/opportunities/1"]}>
+      <MemoryRouter initialEntries={["/app/opportunities/1"]}>
         <App />
       </MemoryRouter>,
     );
@@ -127,7 +127,7 @@ describe("opportunity page", () => {
       ],
     });
     render(
-      <MemoryRouter initialEntries={["/opportunities/1"]}>
+      <MemoryRouter initialEntries={["/app/opportunities/1"]}>
         <App />
       </MemoryRouter>,
     );
@@ -156,7 +156,7 @@ describe("profile form", () => {
     };
     mockFetch({ "GET /config": CONFIG, "GET /profile": profile, "PUT /profile": { profile, reevaluated: 3 } });
     render(
-      <MemoryRouter initialEntries={["/profile"]}>
+      <MemoryRouter initialEntries={["/app/profile"]}>
         <App />
       </MemoryRouter>,
     );
@@ -164,5 +164,58 @@ describe("profile form", () => {
     expect(within(form).getByDisplayValue("CSE")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Save profile" }));
     await waitFor(() => expect(screen.getByText(/Re-checked 3 opportunities/)).toBeInTheDocument());
+  });
+});
+
+describe("sign-in and demo", () => {
+  const DEMO = { demo_mode: true, owner_login: true, llm_configured: false, imap_configured: false, auth_required: true };
+
+  afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it("shows the sign-in page and lets visitors open the demo", async () => {
+    mockFetch({ "GET /config": DEMO, "GET /opportunities": [summary({ company: "Acme Analytics" })] });
+    render(
+      <MemoryRouter initialEntries={["/app"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Explore the live demo/ }));
+    expect(await screen.findByText("Acme Analytics")).toBeInTheDocument();
+    expect(screen.getByText("Demo visitor")).toBeInTheDocument();
+  });
+
+  it("signs the owner in and stores the token", async () => {
+    const fetchMock = mockFetch({
+      "GET /config": DEMO,
+      "POST /auth/login": { token: "tok123", email: "owner@example.com", expires_in: 100 },
+      "GET /opportunities": [],
+    });
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    await userEvent.type(await screen.findByLabelText("Email"), "owner@example.com");
+    await userEvent.type(screen.getByLabelText("Password"), "secret-password");
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByText("owner@example.com")).toBeInTheDocument();
+    expect(localStorage.getItem("cia.token")).toBe("tok123");
+    const login = fetchMock.mock.calls.find(([url]) => String(url).endsWith("/auth/login"))!;
+    expect(JSON.parse(login[1]!.body as string)).toEqual({ email: "owner@example.com", password: "secret-password" });
+  });
+
+  it("locks live checks for demo visitors", async () => {
+    sessionStorage.setItem("cia.demo", "1");
+    mockFetch({ "GET /config": DEMO });
+    render(
+      <MemoryRouter initialEntries={["/app/add"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText(/Live checks are for signed-in users/)).toBeInTheDocument();
   });
 });
