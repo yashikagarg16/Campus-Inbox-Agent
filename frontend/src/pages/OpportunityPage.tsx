@@ -145,15 +145,17 @@ export function OpportunityPage() {
         </Card>
       </div>
 
-      <Card className="space-y-3">
-        <h2 className="font-semibold">Draft answers</h2>
-        <Drafts
-          opportunityId={opp.id}
-          drafts={opp.drafts}
-          onChange={(drafts) => setData({ ...opp, drafts })}
-          llmConfigured={config?.llm_configured ?? false}
-        />
-      </Card>
+      {!config?.demo_mode && (
+        <Card className="space-y-3">
+          <h2 className="font-semibold">Draft answers</h2>
+          <Drafts
+            opportunityId={opp.id}
+            drafts={opp.drafts}
+            onChange={(drafts) => setData({ ...opp, drafts })}
+            llmConfigured={config?.llm_configured ?? false}
+          />
+        </Card>
+      )}
 
       <Card className="space-y-3">
         <AuditLog opportunityId={opp.id} />
