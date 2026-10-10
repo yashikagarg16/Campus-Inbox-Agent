@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Iterable
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from . import rules
@@ -219,7 +219,11 @@ def preview_email(client: LLMClient, text: str, received_at: datetime | None,
 
 def seed_demo(session: Session, seed: dict, user_id: int) -> int:
     """Load synthetic emails with stored (real) extractions into the demo account. No LLM calls."""
+    if session.get_bind().dialect.name == "postgresql":
+        # Serverless instances can start together; only one may seed. Released at commit.
+        session.execute(text("SELECT pg_advisory_xact_lock(424242)"))
     if session.scalars(select(EmailRow).where(EmailRow.user_id == user_id).limit(1)).first() is not None:
+        session.commit()
         return 0
     profile = Profile.model_validate(seed["profile"])
     session.add(ProfileRow(user_id=user_id, data=profile.model_dump(mode="json")))

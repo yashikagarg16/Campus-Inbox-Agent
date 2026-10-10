@@ -13,6 +13,7 @@ import re
 from dataclasses import dataclass
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .auth import hash_password, verify_password
@@ -53,14 +54,19 @@ def ensure_user(session: Session, email: str, role: str, password_hash: str | No
     email = normalize_email(email)
     user = session.scalars(select(UserRow).where(UserRow.email == email)).first()
     if user is None:
-        user = UserRow(email=email, role=role, password_hash=password_hash)
-        session.add(user)
-        session.flush()
-    else:
+        try:
+            user = UserRow(email=email, role=role, password_hash=password_hash)
+            session.add(user)
+            session.commit()
+            return user
+        except IntegrityError:  # another server instance created it at the same moment
+            session.rollback()
+            user = session.scalars(select(UserRow).where(UserRow.email == email)).one()
+    if user.role != role or (password_hash is not None and user.password_hash != password_hash):
         user.role = role
         if password_hash is not None:
             user.password_hash = password_hash
-    session.commit()
+        session.commit()
     return user
 
 
