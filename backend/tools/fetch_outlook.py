@@ -17,6 +17,7 @@ from app.config import Settings
 from app.graph_mail import GraphMail, get_token
 from app.models import make_sessionmaker
 from app.schemas import local_now
+from app.users import LOCAL_EMAIL, ensure_user
 from app.service import sync_messages
 
 
@@ -44,7 +45,8 @@ def main() -> None:
     messages = GraphMail(token).raw_messages(since, sender=settings.imap_sender_filter, limit=args.limit)
     llm = settings.gemini_client()
     with Session() as session:
-        r = sync_messages(session, llm, messages, since, "outlook")
+        owner = ensure_user(session, settings.admin_email or LOCAL_EMAIL, "owner" if settings.admin_email else "local")
+        r = sync_messages(session, llm, messages, since, "outlook", user_id=owner.id)
     print(f"fetched {r.fetched}, new {r.new}, duplicates {r.duplicates}, failed {r.failed}")
 
 

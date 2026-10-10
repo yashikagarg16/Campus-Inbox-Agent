@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -24,10 +24,36 @@ class Base(DeclarativeBase):
     pass
 
 
+class UserRow(Base):
+    """An account. Roles: user (signed up), owner (from ADMIN_* env), demo (public sample data),
+    local (single-user mode when no sign-in is configured)."""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
+    password_hash: Mapped[str | None] = mapped_column(Text)
+    role: Mapped[str] = mapped_column(String(20), default="user")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=local_now)
+
+
+class UsageRow(Base):
+    """LLM calls per user per day, for the free-usage limits."""
+
+    __tablename__ = "usage"
+    __table_args__ = (UniqueConstraint("user_id", "day", name="uq_usage_user_day"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    day: Mapped[str] = mapped_column(String(10))  # YYYY-MM-DD, IST
+    llm_calls: Mapped[int] = mapped_column(Integer, default=0)
+
+
 class ProfileRow(Base):
     __tablename__ = "profile"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
     data: Mapped[dict[str, Any]] = mapped_column(JSON)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=local_now, onupdate=local_now)
 
@@ -36,6 +62,7 @@ class EmailRow(Base):
     __tablename__ = "emails"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     subject: Mapped[str | None] = mapped_column(String(500))
     sender: Mapped[str | None] = mapped_column(String(320))
     message_id: Mapped[str | None] = mapped_column(String(500), index=True)
@@ -128,6 +155,7 @@ class AuditEvent(Base):
     __tablename__ = "audit_events"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(Integer, index=True)
     event: Mapped[str] = mapped_column(String(50))
     email_id: Mapped[int | None] = mapped_column(ForeignKey("emails.id"), index=True)
     opportunity_id: Mapped[int | None] = mapped_column(ForeignKey("opportunities.id"), index=True)

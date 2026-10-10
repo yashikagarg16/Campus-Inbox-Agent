@@ -71,7 +71,7 @@ function NavIcon({ d }: { d: string }) {
 }
 
 function Shell() {
-  const { email, demo, signOut } = useSession();
+  const { email, me, demo, signOut } = useSession();
   const { config } = useServerConfig();
   const navigate = useNavigate();
   const isDemo = config?.demo_mode ?? false;
@@ -119,6 +119,11 @@ function Shell() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{email}</p>
+                {me?.daily_limit != null && (
+                  <p className="text-xs text-slate-500">
+                    {me.usage_today}/{me.daily_limit} checks today
+                  </p>
+                )}
                 <button onClick={leave} className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-slate-100">
                   Sign out
                 </button>
@@ -138,7 +143,7 @@ function Shell() {
       </aside>
 
       <div className="min-w-0">
-        {isDemo && (
+        {isDemo && !email && (
           <div className="border-b border-amber-200/70 bg-amber-50/80 dark:border-amber-900 dark:bg-amber-950/60">
             <p className="mx-auto max-w-6xl px-6 py-2 text-xs text-amber-900 dark:text-amber-200">
               <strong>Read-only demo.</strong> Synthetic placement emails with real Gemini extractions, checked against a

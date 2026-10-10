@@ -5,6 +5,7 @@ import { useServerConfig } from "../App";
 import { Button, buttonClass, Card, ErrorBox, Notice, VerdictBadge } from "../components/ui";
 import { deadlineUrgency, formatDeadline, relativeDeadline, type Urgency } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
+import { useIsVisitor } from "../session";
 
 type Filter = "all" | Verdict;
 
@@ -34,10 +35,11 @@ export function DashboardPage() {
   const { config, error: configError } = useServerConfig();
   const [filter, setFilter] = useState<Filter>("all");
   const [showPast, setShowPast] = useState(false);
-  // The demo's synthetic emails have fixed October 2026 deadlines, so show them all.
+  // The demo's synthetic emails have fixed October 2026 deadlines, so show them all to visitors.
+  const visitor = useIsVisitor();
   useEffect(() => {
-    if (config?.demo_mode) setShowPast(true);
-  }, [config?.demo_mode]);
+    if (visitor) setShowPast(true);
+  }, [visitor]);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<unknown>(null);
@@ -71,7 +73,7 @@ export function DashboardPage() {
           <p className="mt-1 text-sm text-slate-500">Sorted by deadline. Open one to see the sentence behind each rule.</p>
         </div>
         <div className="flex gap-2">
-          {config?.imap_configured && (
+          {config?.imap_configured && !config.demo_mode && (
             <Button variant="secondary" onClick={sync} disabled={syncing}>
               {syncing ? "Checking inbox…" : "Check inbox (last 7 days)"}
             </Button>

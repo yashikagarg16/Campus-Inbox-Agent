@@ -12,23 +12,34 @@ const FEATURES = [
 ];
 
 export function LandingPage() {
-  const { email, demo, signIn, enterDemo } = useSession();
+  const { email, demo, signIn, signUp, enterDemo } = useSession();
   const { config } = useServerConfig();
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
+  // Where to go once signed in: new accounts start on their profile.
+  const [destination, setDestination] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
 
-  if (email || demo) return <Navigate to="/app" replace />;
+  if (destination && email) return <Navigate to={destination} replace />;
+  // Already signed in (or browsing the demo): skip this page.
+  if ((email || demo) && !busy) return <Navigate to="/app" replace />;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setError(null);
+    if (mode === "signup" && password !== confirm) {
+      setError(new Error("The two passwords don't match."));
+      return;
+    }
+    setBusy(true);
     try {
-      await signIn(address, password);
-      navigate("/app");
+      if (mode === "signup") await signUp(address, password);
+      else await signIn(address, password);
+      setDestination(mode === "signup" ? "/app/profile" : "/app");
     } catch (err) {
       setError(err);
     } finally {
@@ -42,6 +53,8 @@ export function LandingPage() {
   }
 
   const loginAvailable = config?.owner_login ?? false;
+  const signupOpen = config?.signup_enabled ?? false;
+  const signingUp = mode === "signup";
 
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
@@ -97,8 +110,35 @@ export function LandingPage() {
             <Logo className="size-8" />
             <span className="font-semibold tracking-tight">Campus Inbox Agent</span>
           </div>
-          <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
-          <p className="mt-1 text-sm text-slate-500">Welcome back. Sign in to run live checks on your emails.</p>
+          {signupOpen && (
+            <div className="mb-6 grid grid-cols-2 rounded-lg bg-slate-200/70 p-1 text-sm font-medium dark:bg-slate-800" role="tablist">
+              {(["signin", "signup"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === m}
+                  onClick={() => {
+                    setMode(m);
+                    setError(null);
+                  }}
+                  className={`rounded-md py-1.5 transition ${
+                    mode === m ? "bg-white shadow-sm dark:bg-slate-950" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  }`}
+                >
+                  {m === "signin" ? "Sign in" : "Create account"}
+                </button>
+              ))}
+            </div>
+          )}
+          <h2 className="text-2xl font-semibold tracking-tight">{signingUp ? "Create your account" : "Sign in"}</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {signingUp
+              ? `Free. Your profile and emails are private to your account${
+                  config?.user_daily_limit ? `; up to ${config.user_daily_limit} email checks a day` : ""
+                }.`
+              : "Welcome back. Sign in to check your placement emails."}
+          </p>
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             <label className="block">
@@ -117,7 +157,8 @@ export function LandingPage() {
               <span className="mb-1.5 block text-sm font-medium">Password</span>
               <input
                 type="password"
-                autoComplete="current-password"
+                autoComplete={signingUp ? "new-password" : "current-password"}
+                minLength={signingUp ? 10 : undefined}
                 className={inputClass}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -125,13 +166,27 @@ export function LandingPage() {
                 required
               />
             </label>
+            {signingUp && (
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium">Confirm password</span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  className={inputClass}
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  required
+                />
+                <span className="mt-1 block text-xs text-slate-500">At least 10 characters.</span>
+              </label>
+            )}
             <ErrorBox error={error} />
             <button
               type="submit"
               disabled={busy || !loginAvailable}
               className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {busy ? "Signing in…" : "Sign in"}
+              {busy ? (signingUp ? "Creating account…" : "Signing in…") : signingUp ? "Create account" : "Sign in"}
             </button>
             {config && !loginAvailable && (
               <p className="text-xs text-slate-500">Sign-in isn't set up on this server.</p>

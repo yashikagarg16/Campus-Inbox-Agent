@@ -54,7 +54,8 @@ def test_private_server_requires_sign_in():
     r = _login(c)
     assert r.status_code == 200
     h = {"Authorization": f"Bearer {r.json()['token']}"}
-    assert c.get("/auth/me", headers=h).json() == {"email": "owner@example.com"}
+    assert c.get("/auth/me", headers=h).json() == {"email": "owner@example.com", "role": "owner",
+                                                   "usage_today": 0, "daily_limit": None}
     assert c.post("/emails", json={"text": SAMPLE_EMAIL}, headers=h).status_code == 201
 
 
@@ -63,7 +64,8 @@ def test_demo_visitors_read_owner_previews_nothing_stored():
     c = TestClient(create_app(Settings(database_url="sqlite://", demo_mode=True, **OWNER), llm_factory=lambda: llm))
     before = len(c.get("/opportunities").json())
     assert before == 38  # visitors can read without signing in
-    assert c.post("/preview", json={"text": SAMPLE_EMAIL}).status_code == 403
+    assert c.post("/preview", json={"text": SAMPLE_EMAIL}).status_code == 401
+    assert c.post("/emails", json={"text": SAMPLE_EMAIL}).status_code == 403
     assert c.get("/auth/me").status_code == 401
 
     h = {"Authorization": f"Bearer {_login(c).json()['token']}"}
@@ -71,9 +73,8 @@ def test_demo_visitors_read_owner_previews_nothing_stored():
     assert r.status_code == 200, r.text
     opp = r.json()["opportunities"][0]
     assert opp["company"] == "Acme Analytics" and opp["decision"]["rules"]
-    assert len(c.get("/opportunities").json()) == before  # nothing stored
-    # Even the owner can't write to the shared demo data.
-    assert c.post("/emails", json={"text": SAMPLE_EMAIL}, headers=h).status_code == 403
+    assert len(c.get("/opportunities").json()) == before  # visitors' view unchanged
+    assert c.get("/opportunities", headers=h).json() == []  # the owner has their own (empty) account
 
 
 def test_login_disabled_without_owner_config():

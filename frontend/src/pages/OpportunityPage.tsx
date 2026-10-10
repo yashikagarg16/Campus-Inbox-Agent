@@ -10,6 +10,7 @@ import { Button, buttonClass, Card, ErrorBox, Notice, VerdictBadge } from "../co
 import { deadlineUrgency, formatDateTime, formatDeadline, formatValue, relativeDeadline, RULE_LABELS } from "../lib/format";
 import type { Mark } from "../lib/highlight";
 import { useAsync } from "../lib/useAsync";
+import { useIsVisitor } from "../session";
 
 const FIELD_LABELS: Record<string, string> = {
   ...RULE_LABELS,
@@ -23,6 +24,7 @@ export function OpportunityPage() {
   const id = Number(useParams().id);
   const navigate = useNavigate();
   const { config } = useServerConfig();
+  const visitor = useIsVisitor();
   const { data: opp, setData, error, loading } = useAsync(() => api.getOpportunity(id), [id]);
   const [activeKey, setActiveKey] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<unknown>(null);
@@ -145,7 +147,7 @@ export function OpportunityPage() {
         </Card>
       </div>
 
-      {!config?.demo_mode && (
+      {!visitor && (
         <Card className="space-y-3">
           <h2 className="font-semibold">Draft answers</h2>
           <Drafts
@@ -160,7 +162,7 @@ export function OpportunityPage() {
       <Card className="space-y-3">
         <AuditLog opportunityId={opp.id} />
         <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
-          {!config?.demo_mode && (
+          {!visitor && (
             <Button variant="danger" onClick={remove}>
               Delete email
             </Button>

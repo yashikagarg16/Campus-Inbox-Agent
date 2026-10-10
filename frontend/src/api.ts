@@ -96,6 +96,8 @@ export interface AuditEvent {
 export interface ServerConfig {
   demo_mode?: boolean;
   owner_login?: boolean;
+  signup_enabled?: boolean;
+  user_daily_limit?: number | null;
   llm_configured: boolean;
   imap_configured: boolean; // any inbox sync is set up
   mail_source?: "graph" | "imap" | null;
@@ -137,6 +139,20 @@ export function getApiUrl(): string {
 
 export function getToken(): string {
   return readStorage(TOKEN_KEY) ?? "";
+}
+
+export interface AuthResult {
+  token: string;
+  email: string;
+  role: string;
+  expires_in: number;
+}
+
+export interface Me {
+  email: string;
+  role: "user" | "owner" | "local" | "demo";
+  usage_today: number;
+  daily_limit: number | null;
 }
 
 export function setToken(token: string): void {
@@ -206,11 +222,11 @@ const json = (body: unknown) => JSON.stringify(body);
 export const api = {
   config: () => request<ServerConfig>("/config"),
   login: (email: string, password: string) =>
-    request<{ token: string; email: string; expires_in: number }>("/auth/login", {
-      method: "POST",
-      body: json({ email, password }),
-    }),
-  me: () => request<{ email: string }>("/auth/me"),
+    request<AuthResult>("/auth/login", { method: "POST", body: json({ email, password }) }),
+  signup: (email: string, password: string) =>
+    request<AuthResult>("/auth/signup", { method: "POST", body: json({ email, password }) }),
+  me: () => request<Me>("/auth/me"),
+  deleteAccount: () => request<void>("/auth/me", { method: "DELETE" }),
   preview: (body: { text: string; received_at?: string }) =>
     request<PreviewResult>("/preview", { method: "POST", body: json(body) }),
   getProfile: () => request<Profile>("/profile"),

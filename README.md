@@ -139,9 +139,10 @@ If your college blocks app registration or shows "Need admin approval", use the 
 |---|---|---|
 | GET | `/health` | No auth |
 | GET | `/config` | What the server has configured (no auth) |
-| POST | `/auth/login` | Owner sign-in: `{"email", "password"}` returns a 7-day session token |
-| GET | `/auth/me` | Who the token belongs to |
-| POST | `/preview` | Owner only. Runs the full pipeline on one email and returns the result **without storing it** |
+| POST | `/auth/signup` | Create an account: `{"email", "password"}` (when `SIGNUP_ENABLED=true`) |
+| POST | `/auth/login` | Sign in; returns a 7-day session token |
+| GET / DELETE | `/auth/me` | Your role and today's usage / delete your account and all its data |
+| POST | `/preview` | Signed in. Runs the full pipeline on one email and returns the result **without storing it** |
 | GET / PUT | `/profile` | Batch, CGPA, branch (+aliases), 10th/12th %, backlogs, skills, about-you text |
 | POST | `/emails` | Pasted text: `{"text", "subject?", "received_at?"}`; 201 new, 200 duplicate |
 | POST | `/emails/eml` | Upload a `.eml` file |
@@ -153,24 +154,36 @@ If your college blocks app registration or shows "Need admin approval", use the 
 | POST | `/opportunities/{id}/drafts` | `{"questions": [...]}` |
 | PUT / DELETE | `/drafts/{id}` | Edit (`answer`) or approve (`status: "approved"`) |
 
-### Access control
+### Accounts and access control
 
-- **Owner sign-in** (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`): one account. The password
-  is stored only as a salted PBKDF2 hash (`python -m tools.hash_password` makes one), sessions are
-  HMAC-signed tokens that expire after 7 days, and 5 wrong attempts lock an IP out for 5 minutes.
+- **Sign-up** (`SIGNUP_ENABLED=true`): anyone can create an account with an email and a password of at
+  least 10 characters. **Every email, opportunity, draft, profile and audit entry belongs to one
+  account, and every query is scoped to it**: users can't see or change each other's data. Users can
+  delete their account, which removes everything they stored.
+- **Usage limits**, because the server's Gemini key pays for every check: each account gets
+  `USER_DAILY_LIMIT` (default 10) LLM-backed actions per day, and all accounts together
+  `GLOBAL_DAILY_LIMIT` (default 100). Re-adding an email you've already checked is free.
+- **Owner** (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`): a built-in account with no usage limit, the only
+  one allowed to sync the server's inbox.
+- Passwords are stored only as salted PBKDF2 hashes (`python -m tools.hash_password` makes one for the
+  owner), sessions are HMAC-signed tokens (`SESSION_SECRET`) that expire after 7 days, wrong passwords
+  lock an IP out for 5 minutes after 5 tries, and sign-ups are limited to 5 per IP per hour.
+- With no sign-in configured (local use), everything belongs to a single local account.
 - **`APP_TOKEN`**: an alternative static bearer token for scripts.
 - With either set, every endpoint except `/health`, `/config` and `/auth/login` needs
   `Authorization: Bearer <token>`. **Set one on any server reachable from the internet**: the database
   holds your profile and emails.
-- **`DEMO_MODE=true`** (the public deployment): seeds the 36 synthetic emails with their stored real
-  Gemini extractions, lets anyone read, rejects every write, and lets only the signed-in owner run
-  `/preview`. Visitors never trigger a Gemini call.
+- **`DEMO_MODE=true`** (the public deployment): seeds the 36 synthetic emails into a read-only demo
+  account that visitors browse without signing in. Visitors never trigger a Gemini call; signed-in users
+  work in their own accounts.
+- **Accounts need a persistent database.** In demo mode without `DATABASE_URL` pointing at PostgreSQL,
+  the SQLite file in `/tmp` is rebuilt on every cold start, so leave `SIGNUP_ENABLED` off there.
 
 ## Tests
 
 ```bash
-cd backend && pytest -q          # 143 tests (+1 Postgres test); uses a fake LLM, no API key needed
-cd frontend && npm test          # 18 tests
+cd backend && pytest -q          # 155 tests (+1 Postgres test); uses a fake LLM, no API key needed
+cd frontend && npm test          # 19 tests
 ```
 
 To also run the PostgreSQL integration test locally, set

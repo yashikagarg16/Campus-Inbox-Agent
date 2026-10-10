@@ -191,7 +191,8 @@ describe("sign-in and demo", () => {
   it("signs the owner in and stores the token", async () => {
     const fetchMock = mockFetch({
       "GET /config": DEMO,
-      "POST /auth/login": { token: "tok123", email: "owner@example.com", expires_in: 100 },
+      "POST /auth/login": { token: "tok123", email: "owner@example.com", role: "owner", expires_in: 100 },
+      "GET /auth/me": { email: "owner@example.com", role: "owner", usage_today: 0, daily_limit: null },
       "GET /opportunities": [],
     });
     render(
@@ -208,7 +209,38 @@ describe("sign-in and demo", () => {
     expect(JSON.parse(login[1]!.body as string)).toEqual({ email: "owner@example.com", password: "secret-password" });
   });
 
-  it("locks live checks for demo visitors", async () => {
+  it("creates an account with matching passwords and shows usage", async () => {
+    const fetchMock = mockFetch({
+      "GET /config": { ...DEMO, signup_enabled: true, user_daily_limit: 10 },
+      "POST /auth/signup": { token: "new-tok", email: "new@example.com", role: "user", expires_in: 100 },
+      "GET /auth/me": { email: "new@example.com", role: "user", usage_today: 2, daily_limit: 10 },
+      "GET /profile": {
+        name: null, batch: null, cgpa: null, cgpa_scale: 10, branch: null, tenth_percent: null, twelfth_percent: null,
+        active_backlogs: null, skills: [], branch_aliases: [], resume_summary: null,
+      },
+    });
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    await userEvent.click(await screen.findByRole("tab", { name: "Create account" }));
+    await userEvent.type(screen.getByLabelText("Email"), "new@example.com");
+    await userEvent.type(screen.getByLabelText("Password"), "long-password-1");
+    await userEvent.type(screen.getByLabelText(/Confirm password/), "different-pass-1");
+    await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("The two passwords don't match.")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/auth/signup"))).toBe(false);
+
+    await userEvent.clear(screen.getByLabelText(/Confirm password/));
+    await userEvent.type(screen.getByLabelText(/Confirm password/), "long-password-1");
+    await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("2/10 checks today")).toBeInTheDocument();
+    expect(localStorage.getItem("cia.token")).toBe("new-tok");
+    expect(await screen.findByRole("button", { name: "Delete my account" })).toBeInTheDocument(); // landed on Profile
+  });
+
+  it("locks adding emails for demo visitors", async () => {
     sessionStorage.setItem("cia.demo", "1");
     mockFetch({ "GET /config": DEMO });
     render(
@@ -216,6 +248,7 @@ describe("sign-in and demo", () => {
         <App />
       </MemoryRouter>,
     );
-    expect(await screen.findByText(/Live checks are for signed-in users/)).toBeInTheDocument();
+    expect(await screen.findByText(/Check your own placement emails/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create a free account" })).toBeInTheDocument();
   });
 });

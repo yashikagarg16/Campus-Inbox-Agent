@@ -43,7 +43,11 @@ class Settings:
     # Owner sign-in (one account). Hash from `python -m tools.hash_password`.
     admin_email: str | None = None
     admin_password_hash: str | None = None
-    session_secret: str | None = None  # signs session tokens; required with admin login
+    session_secret: str | None = None  # signs session tokens; required for any sign-in
+    # Let anyone create an account. Each account's data is private to it.
+    signup_enabled: bool = False
+    user_daily_limit: int = 10  # LLM-backed actions per account per day (owner exempt)
+    global_daily_limit: int = 100  # across all signed-up accounts per day
 
     @property
     def owner_login(self) -> bool:
@@ -51,7 +55,7 @@ class Settings:
 
     @property
     def auth_required(self) -> bool:
-        return bool(self.app_token or self.owner_login)
+        return bool(self.app_token or self.owner_login or self.signup_enabled)
 
     def gemini_client(self):
         from .extractor import GeminiClient
@@ -94,4 +98,7 @@ class Settings:
             admin_email=(env("ADMIN_EMAIL") or "").strip().lower() or None,
             admin_password_hash=env("ADMIN_PASSWORD_HASH") or None,
             session_secret=env("SESSION_SECRET") or None,
+            signup_enabled=env("SIGNUP_ENABLED", "false").lower() == "true",
+            user_daily_limit=int(env("USER_DAILY_LIMIT") or cls.user_daily_limit),
+            global_daily_limit=int(env("GLOBAL_DAILY_LIMIT") or cls.global_daily_limit),
         )

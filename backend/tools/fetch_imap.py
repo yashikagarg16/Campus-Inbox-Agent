@@ -16,6 +16,7 @@ from datetime import timedelta
 from app.config import Settings
 from app.models import make_sessionmaker
 from app.schemas import local_now
+from app.users import LOCAL_EMAIL, ensure_user
 from app.service import sync_imap
 
 
@@ -34,8 +35,8 @@ def main() -> None:
     Session = make_sessionmaker(settings.database_url, migrate=settings.migrate_on_startup)
     since = (local_now() - timedelta(days=args.days)).date()
     with Session() as session:
-        result = sync_imap(session, settings.gemini_client(),
-                           settings, since, limit=args.limit)
+        owner = ensure_user(session, settings.admin_email or LOCAL_EMAIL, "owner" if settings.admin_email else "local")
+        result = sync_imap(session, settings.gemini_client(), settings, since, limit=args.limit, user_id=owner.id)
     print(f"fetched {result.fetched}, new {result.new}, duplicates {result.duplicates}, failed {result.failed}")
 
 

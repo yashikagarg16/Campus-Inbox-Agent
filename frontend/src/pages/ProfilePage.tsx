@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api, type Profile } from "../api";
-import { useServerConfig } from "../App";
+import { useNavigate } from "react-router-dom";
+import { useIsVisitor, useSession } from "../session";
 import { Button, Card, ErrorBox, Field, inputClass, Notice } from "../components/ui";
 import { splitList } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
@@ -58,7 +59,9 @@ export function ProfilePage() {
   const { data, error } = useAsync(() => api.getProfile(), []);
   const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
-  const demo = useServerConfig().config?.demo_mode ?? false;
+  const demo = useIsVisitor();
+  const { me, signOut } = useSession();
+  const navigate = useNavigate();
   const [saveError, setSaveError] = useState<unknown>(null);
   const [saved, setSaved] = useState<string | null>(null);
 
@@ -141,6 +144,32 @@ export function ProfilePage() {
       </Card>
       <ErrorBox error={saveError} />
       {saved && <Notice tone="ok">{saved}</Notice>}
+      {me?.role === "user" && <DeleteAccount onDeleted={() => { signOut(); navigate("/"); }} />}
     </div>
+  );
+}
+
+function DeleteAccount({ onDeleted }: { onDeleted: () => void }) {
+  const [error, setError] = useState<unknown>(null);
+  async function remove() {
+    if (!window.confirm("Delete your account? This permanently removes your profile, emails and drafts.")) return;
+    try {
+      await api.deleteAccount();
+      onDeleted();
+    } catch (e) {
+      setError(e);
+    }
+  }
+  return (
+    <Card className="space-y-2">
+      <h2 className="font-semibold">Delete account</h2>
+      <p className="text-sm text-slate-600 dark:text-slate-400">
+        Permanently removes your account and everything stored in it. This can't be undone.
+      </p>
+      <Button variant="danger" onClick={remove}>
+        Delete my account
+      </Button>
+      <ErrorBox error={error} />
+    </Card>
   );
 }
