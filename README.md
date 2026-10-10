@@ -7,7 +7,7 @@ exact sentence from the email behind every decision. When it can't be sure, it s
 
 ## Demo and status
 
-**Live demo: https://campus-inbox-agent.vercel.app** (click *Explore the live demo*; read-only, synthetic emails).
+**Live: https://campus-inbox-agent.vercel.app**: click *Explore the live demo* (read-only, synthetic emails) or *Create account* to check your own emails privately.
 
 **[Watch the 2-minute demo (docs/demo.webm)](docs/demo.webm)**: real Gemini extraction on a made-up
 profile and synthetic emails. It shows an "8.5+ out of 10" email marked *Not eligible* with its sentence
@@ -20,7 +20,7 @@ drafted form answers that say `[NEEDS INPUT]` instead of inventing facts.
 | Real Gemini run | Working (`gemini-3.8-flash` with retries and a lite fallback) |
 | Accuracy (synthetic) | 36 synthetic emails written for testing (38 opportunities, incl. digests, extensions, reminders, 4-point GPA, relaxable cutoffs, M.Tech-only drives, notices): **35/38 verdicts correct, 3 'needs review', 0 confidently wrong**; all 38 opportunities found. **Not a benchmark**: these aren't real emails. |
 | Real-email eval (60–100 labeled college emails) | In progress. College Outlook needs admin consent for API access, so emails are collected as `.eml` downloads |
-| Deployment | Live on Vercel: frontend + FastAPI backend (Python function) in read-only demo mode |
+| Deployment | Live on Vercel (frontend + FastAPI Python function) with Neon PostgreSQL: public read-only demo, free sign-up with private accounts, daily usage limits |
 
 ## How it works
 
