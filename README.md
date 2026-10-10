@@ -138,7 +138,10 @@ If your college blocks app registration or shows "Need admin approval", use the 
 | Method | Path | |
 |---|---|---|
 | GET | `/health` | No auth |
-| GET | `/config` | What the server has configured |
+| GET | `/config` | What the server has configured (no auth) |
+| POST | `/auth/login` | Owner sign-in: `{"email", "password"}` returns a 7-day session token |
+| GET | `/auth/me` | Who the token belongs to |
+| POST | `/preview` | Owner only. Runs the full pipeline on one email and returns the result **without storing it** |
 | GET / PUT | `/profile` | Batch, CGPA, branch (+aliases), 10th/12th %, backlogs, skills, about-you text |
 | POST | `/emails` | Pasted text: `{"text", "subject?", "received_at?"}`; 201 new, 200 duplicate |
 | POST | `/emails/eml` | Upload a `.eml` file |
@@ -150,15 +153,24 @@ If your college blocks app registration or shows "Need admin approval", use the 
 | POST | `/opportunities/{id}/drafts` | `{"questions": [...]}` |
 | PUT / DELETE | `/drafts/{id}` | Edit (`answer`) or approve (`status: "approved"`) |
 
-If `APP_TOKEN` is set, every endpoint except `/health` needs `Authorization: Bearer <APP_TOKEN>`.
-Enter the token on the frontend's Settings page. **Set it on any deployed server**: the database
-holds your profile and emails.
+### Access control
+
+- **Owner sign-in** (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`): one account. The password
+  is stored only as a salted PBKDF2 hash (`python -m tools.hash_password` makes one), sessions are
+  HMAC-signed tokens that expire after 7 days, and 5 wrong attempts lock an IP out for 5 minutes.
+- **`APP_TOKEN`**: an alternative static bearer token for scripts.
+- With either set, every endpoint except `/health`, `/config` and `/auth/login` needs
+  `Authorization: Bearer <token>`. **Set one on any server reachable from the internet**: the database
+  holds your profile and emails.
+- **`DEMO_MODE=true`** (the public deployment): seeds the 36 synthetic emails with their stored real
+  Gemini extractions, lets anyone read, rejects every write, and lets only the signed-in owner run
+  `/preview`. Visitors never trigger a Gemini call.
 
 ## Tests
 
 ```bash
-cd backend && pytest -q          # 114 tests; uses a fake LLM, no API key needed
-cd frontend && npm test          # 15 tests
+cd backend && pytest -q          # 143 tests (+1 Postgres test); uses a fake LLM, no API key needed
+cd frontend && npm test          # 18 tests
 ```
 
 To also run the PostgreSQL integration test locally, set
@@ -167,8 +179,10 @@ schema of that database). CI runs it against a Postgres container on every push.
 
 ## Eval
 
-`backend/eval/data/synthetic.jsonl` has 8 **made-up** emails (including a digest email and a
-"closes tomorrow" deadline) to exercise the harness. They are not a benchmark. For real numbers:
+`backend/eval/data/synthetic.jsonl` has 36 **made-up** emails (38 opportunities: digests, deadline
+extensions, reminders, relaxable cutoffs, 4-point GPA, M.Tech-only drives, notices) to exercise the
+harness. Latest run with `gemini-3.8-flash`: 35/38 verdicts correct, 3 "needs review", 0 confidently
+wrong. They are not a benchmark. For real numbers:
 
 1. Collect 60–100 real emails into `eval/data/private/candidates.jsonl` (gitignored). With Outlook or
    IMAP set up:
@@ -188,7 +202,8 @@ schema of that database). CI runs it against a Postgres container on every push.
 
 ```bash
 cd backend
-python -m eval.run_eval --data eval/data/private/test.jsonl              # calls Gemini
+python -m eval.run_eval --data eval/data/private/test.jsonl              # calls Gemini, 8 in parallel
+python -m eval.run_eval --data ... --retry-failed --workers 2           # re-run only quota failures
 python -m eval.run_eval --data ... --replay eval/out/predictions.jsonl  # re-score for free
 ```
 
@@ -213,14 +228,26 @@ It starts a fresh backend and frontend, so stop any running dev servers first (o
 
 ## Deploy
 
-**Backend + database on Render**: New › Blueprint › this repo. `render.yaml` creates the API and a
-PostgreSQL database and generates `APP_TOKEN` (copy it from the Render dashboard). Set
-`GEMINI_API_KEY` and `CORS_ORIGINS` (your Vercel URL).
+The live site runs on **Vercel** as two projects from this repo:
 
-**Frontend on Vercel**: import the repo, set the root directory to `frontend` and
-`VITE_API_URL` to the Render URL. `vercel.json` handles client-side routes.
+| Project | Root | Settings |
+|---|---|---|
+| `campus-inbox-agent` (React) | `frontend/` | `VITE_API_URL=https://<api-project>.vercel.app` |
+| `campus-inbox-agent-api` (FastAPI, Python function) | `backend/` | `DEMO_MODE=true`, `DATABASE_URL=sqlite:////tmp/campus_inbox.db`, `CORS_ORIGINS=https://<frontend>.vercel.app`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`, `GEMINI_THINKING_LEVEL=low` |
 
-For a public demo, use a demo profile and redacted or synthetic emails, not your real ones.
+```bash
+cd backend  && npx vercel link --project campus-inbox-agent-api && npx vercel deploy --prod
+cd frontend && npx vercel link --project campus-inbox-agent     && npx vercel deploy --prod
+```
+
+`backend/index.py` is the entry point, `backend/vercel.json` allows 60 s per request (live checks
+call Gemini), and `.vercelignore` keeps `.env` and local data out of uploads. In demo mode the
+SQLite file in `/tmp` is rebuilt from `demo_data/seed.json` on each cold start, so nothing persists
+and no database service is needed.
+
+**For your own private, persistent instance**, use PostgreSQL (`DATABASE_URL=postgresql://...`)
+with `DEMO_MODE` unset and owner sign-in configured. `render.yaml` is a ready-made Render blueprint
+for that (API + managed Postgres).
 
 ## Schema changes
 
