@@ -22,6 +22,26 @@ drafted form answers that say `[NEEDS INPUT]` instead of inventing facts.
 | Real-email eval (60–100 labeled college emails) | In progress. College Outlook needs admin consent for API access, so emails are collected as `.eml` downloads |
 | Deployment | Live on Vercel (frontend + FastAPI Python function) with Neon PostgreSQL: public read-only demo, free sign-up with private accounts, daily usage limits |
 
+## Screenshots
+
+From the public read-only demo (synthetic emails, made-up profile).
+
+![Landing page](docs/screenshots/01-landing.png)
+
+![Opportunities dashboard](docs/screenshots/02-dashboard.png)
+
+| Not eligible: the CGPA cutoff and its sentence | Digest email split into separate opportunities |
+| --- | --- |
+| ![Not eligible](docs/screenshots/03-not-eligible.png) | ![Digest split](docs/screenshots/04-digest-split.png) |
+
+| Needs review: a condition code can't check | Eligible: every rule backed by a quote |
+| --- | --- |
+| ![Needs review](docs/screenshots/05-needs-review.png) | ![Eligible](docs/screenshots/06-eligible.png) |
+
+| Profile the rules check against | |
+| --- | --- |
+| ![Profile](docs/screenshots/07-profile.png) | |
+
 ## How it works
 
 ```
